@@ -77,9 +77,9 @@ export default function RewardsBuilder() {
   return (
     <div className="min-h-screen bg-gradient-subtle">
       {/* Hero Section */}
-      <section className="relative overflow-hidden py-20">
+      <section className="relative overflow-hidden py-12">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
+          <div className="max-w-6xl mx-auto text-center">
             <Badge className="mb-4 bg-accent text-accent-foreground border-0">
               Rewards Program Builder
             </Badge>
@@ -89,25 +89,16 @@ export default function RewardsBuilder() {
             <p className="text-xl text-muted-foreground mb-8">
               Select your preferences and watch your discount grow in real-time
             </p>
-
-            {/* Discount Display */}
-            <div className="sticky top-4 bg-card rounded-2xl p-8 shadow-card border border-border z-10">
-              <div className="text-muted-foreground text-sm uppercase tracking-wide mb-2">
-                Your Total Discount
-              </div>
-              <div className="text-6xl md:text-7xl font-bold bg-gradient-primary bg-clip-text text-transparent transition-all duration-500">
-                R{totalDiscount.toLocaleString()}
-              </div>
-              <div className="text-muted-foreground text-sm mt-2">per month</div>
-            </div>
           </div>
         </div>
       </section>
 
-      {/* Configuration Sections */}
+      {/* Main Content with Sticky Discount */}
       <section className="pb-20">
         <div className="container mx-auto px-4">
-          <div className="max-w-5xl mx-auto space-y-12">
+          <div className="max-w-6xl mx-auto grid lg:grid-cols-[1fr_300px] gap-8">
+            {/* Configuration Options */}
+            <div className="space-y-12 order-2 lg:order-1">
             {/* Shopping Amount */}
             <div className="space-y-4">
               <div>
@@ -280,6 +271,20 @@ export default function RewardsBuilder() {
                     <div className="text-sm text-muted-foreground">+R0</div>
                   </Card>
                 </div>
+              </div>
+              </div>
+            </div>
+
+            {/* Sticky Discount Display */}
+            <div className="order-1 lg:order-2">
+              <div className="sticky top-4 bg-card rounded-2xl p-6 shadow-card border border-border">
+                <div className="text-muted-foreground text-xs uppercase tracking-wide mb-2">
+                  Your Total Discount
+                </div>
+                <div className="text-5xl font-bold bg-gradient-primary bg-clip-text text-transparent transition-all duration-500">
+                  R{totalDiscount.toLocaleString()}
+                </div>
+                <div className="text-muted-foreground text-xs mt-2">per month</div>
               </div>
             </div>
           </div>
