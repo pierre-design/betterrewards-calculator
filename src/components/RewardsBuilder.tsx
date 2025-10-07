@@ -91,7 +91,7 @@ export default function RewardsBuilder() {
             </p>
 
             {/* Discount Display */}
-            <div className="bg-card rounded-2xl p-8 shadow-card border border-border">
+            <div className="sticky top-4 bg-card rounded-2xl p-8 shadow-card border border-border z-10">
               <div className="text-muted-foreground text-sm uppercase tracking-wide mb-2">
                 Your Total Discount
               </div>
