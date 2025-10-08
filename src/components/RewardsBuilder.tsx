@@ -257,12 +257,14 @@ export default function RewardsBuilder() {
   // Reusable discount tile content
   const DiscountTileContent = () => (
     <>
-      <h2 className="text-2xl md:text-3xl font-bold mb-2 text-white">You'll be saving</h2>
+      <h2 className="text-2xl md:text-3xl font-bold mb-2 text-white">You could be saving</h2>
       <div className="text-5xl md:text-6xl lg:text-7xl font-bold text-white transition-all duration-500 mb-3 break-words">
         R{totalDiscount.toLocaleString()}
       </div>
       <div className="text-2xl md:text-3xl font-bold mt-3 text-white">every month<span className="font-normal">*</span></div>
-      <div className="text-2xl md:text-3xl font-bold text-white">while protecting your loved ones</div>
+      <div className="text-lg mt-4" style={{ color: '#8DCB89' }}>
+        That's R{(totalDiscount * 12).toLocaleString()} back in your pocket every year, with cover that protects your loved ones.
+      </div>
       <div className="flex flex-wrap gap-2 mt-4">
         {selections.hasHealthCheck === true && (
           <Badge className="bg-accent text-accent-foreground border-0">
