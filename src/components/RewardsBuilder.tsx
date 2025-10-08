@@ -1,14 +1,18 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 import { Check } from "lucide-react";
 
-type ShoppingAmount = 500 | 1500 | 2000 | 3000;
+type ShoppingAmount = 500 | 1500 | 2000 | 3000 | 'custom';
 type InsuranceAmount = 500 | 1500 | 2500 | 3500 | 4000 | 4500;
 type HealthLevel = "athlete" | "active" | "healthier" | "unhealthy" | "ohboy";
 
 interface Selections {
   shopping: ShoppingAmount | null;
+  customAmount: number | null;
   isMember: boolean | null;
   insurance: InsuranceAmount | null;
   healthLevel: HealthLevel | null;
@@ -22,6 +26,7 @@ const shoppingOptions = [
   { value: 1500 as ShoppingAmount, label: "R1,500", percentage: 30 },
   { value: 2000 as ShoppingAmount, label: "R2,000", percentage: 35 },
   { value: 3000 as ShoppingAmount, label: "R3,000", percentage: 40 },
+  { value: 'custom' as ShoppingAmount, label: "Add amount", percentage: 0 },
 ];
 
 const insuranceOptions = [
@@ -44,6 +49,7 @@ const healthOptions = [
 export default function RewardsBuilder() {
   const [selections, setSelections] = useState<Selections>({
     shopping: null,
+    customAmount: null,
     isMember: null,
     insurance: null,
     healthLevel: null,
@@ -55,6 +61,8 @@ export default function RewardsBuilder() {
   const [glowIntensity, setGlowIntensity] = useState(false);
   const [showFixedTile, setShowFixedTile] = useState(false);
   const [originalTileOpacity, setOriginalTileOpacity] = useState(1);
+  const [showCustomModal, setShowCustomModal] = useState(false);
+  const [customInput, setCustomInput] = useState('');
 
   const getInsurancePercentage = (insuranceAmount: InsuranceAmount, healthLevel: HealthLevel | null): number => {
     // Default percentages (Health level 1 - "Oh boy")
@@ -112,6 +120,13 @@ export default function RewardsBuilder() {
     // Need shopping amount to calculate discount
     if (!selections.shopping) return 0;
 
+    // Get the actual shopping amount (custom or predefined)
+    const actualShoppingAmount = selections.shopping === 'custom'
+      ? selections.customAmount || 0
+      : selections.shopping;
+
+    if (actualShoppingAmount === 0) return 0;
+
     let discountPercentage = 0;
 
     // If BetterRewards Member is selected, start with 10% base
@@ -131,10 +146,37 @@ export default function RewardsBuilder() {
     if (selections.hasCapitec === true) discountPercentage += 5;
 
     // Apply the total discount percentage to the shopping amount
-    return Math.round((selections.shopping * discountPercentage) / 100);
+    return Math.round((actualShoppingAmount * discountPercentage) / 100);
   };
 
   const totalDiscount = calculateDiscount();
+
+  // Handle custom amount submission
+  const handleCustomAmountSubmit = () => {
+    const amount = parseInt(customInput);
+    if (amount && amount > 0) {
+      setSelections({
+        ...selections,
+        shopping: 'custom',
+        customAmount: amount
+      });
+      setShowCustomModal(false);
+      setCustomInput('');
+    }
+  };
+
+  // Handle shopping option click
+  const handleShoppingOptionClick = (value: ShoppingAmount) => {
+    if (value === 'custom') {
+      setShowCustomModal(true);
+    } else {
+      setSelections({
+        ...selections,
+        shopping: selections.shopping === value ? null : value,
+        customAmount: null
+      });
+    }
+  };
 
   // Reusable discount tile content
   const DiscountTileContent = () => (
@@ -265,24 +307,64 @@ export default function RewardsBuilder() {
                   {shoppingOptions.map((option) => (
                     <Card
                       key={option.value}
-                      className={`relative p-6 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 ${selections.shopping === option.value
-                        ? "border-primary bg-accent shadow-hover"
-                        : "border-border hover:border-primary/50"
+                      className={`relative p-6 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 ${option.value === 'custom' ? 'col-span-2 md:col-span-1' : ''
+                        } ${selections.shopping === option.value
+                          ? "border-primary bg-accent shadow-hover"
+                          : "border-border hover:border-primary/50"
                         }`}
-                      onClick={() => setSelections({
-                        ...selections,
-                        shopping: selections.shopping === option.value ? null : option.value
-                      })}
+                      onClick={() => handleShoppingOptionClick(option.value)}
                     >
                       {selections.shopping === option.value && (
                         <div className="absolute top-3 right-3 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
                           <Check className="w-4 h-4 text-primary-foreground" />
                         </div>
                       )}
-                      <div className="text-2xl font-bold text-foreground mb-1">{option.label}</div>
+                      <div className="text-2xl font-bold text-foreground mb-1">
+                        {option.value === 'custom' && selections.customAmount
+                          ? `R${selections.customAmount.toLocaleString()}`
+                          : option.label}
+                      </div>
                     </Card>
                   ))}
                 </div>
+
+                {/* Custom Amount Modal */}
+                <Dialog open={showCustomModal} onOpenChange={setShowCustomModal}>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Add Custom Amount</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">R</span>
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          value={customInput}
+                          onChange={(e) => setCustomInput(e.target.value)}
+                          className="pl-8"
+                          min="1"
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowCustomModal(false)}
+                          className="flex-1"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={handleCustomAmountSubmit}
+                          className="flex-1"
+                          disabled={!customInput || parseInt(customInput) <= 0}
+                        >
+                          Add
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
 
               {/* Divider */}
