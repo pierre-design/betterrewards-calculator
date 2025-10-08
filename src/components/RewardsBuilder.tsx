@@ -307,7 +307,7 @@ export default function RewardsBuilder() {
                   {shoppingOptions.map((option) => (
                     <Card
                       key={option.value}
-                      className={`relative p-6 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 ${option.value === 'custom' ? 'col-span-2 md:col-span-1' : ''
+                      className={`relative p-6 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 ${option.value === 'custom' ? 'col-span-2' : ''
                         } ${selections.shopping === option.value
                           ? "border-primary bg-accent shadow-hover"
                           : "border-border hover:border-primary/50"
