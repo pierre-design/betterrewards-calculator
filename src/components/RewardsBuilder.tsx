@@ -277,7 +277,7 @@ export default function RewardsBuilder() {
 
             {/* Sticky Discount Display */}
             <div className="order-1 lg:order-2">
-              <div className="sticky top-4 bg-card rounded-2xl p-6 shadow-card border border-border">
+              <div className="sticky top-8 z-10 bg-card rounded-2xl p-6 shadow-card border border-border">
                 <div className="text-muted-foreground text-xs uppercase tracking-wide mb-2">
                   Your Total Discount
                 </div>
