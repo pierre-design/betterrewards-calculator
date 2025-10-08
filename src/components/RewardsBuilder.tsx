@@ -258,7 +258,7 @@ export default function RewardsBuilder() {
               {/* Shopping Amount */}
               <div className="space-y-4">
                 <div>
-                  <h2 className="text-2xl md:text-3xl font-bold mb-2">How much do you spend at Dis-Chem?</h2>
+                  <h2 className="text-2xl md:text-3xl font-bold mb-2">How much do you spend<br />at Dis-Chem?</h2>
                   <p className="text-muted-foreground">Select your typical monthly spend</p>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
