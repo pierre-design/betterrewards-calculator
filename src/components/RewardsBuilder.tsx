@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Check } from "lucide-react";
 
 type ShoppingAmount = 500 | 1500 | 2000 | 3000 | 'custom';
-type InsuranceAmount = 500 | 1500 | 2500 | 3500 | 4000 | 4500;
+type InsuranceAmount = 500 | 1500 | 2500 | 3500 | 4000 | 4500 | 'custom';
 type HealthLevel = "athlete" | "active" | "healthier" | "unhealthy" | "ohboy";
 
 interface Selections {
@@ -15,6 +15,7 @@ interface Selections {
   customAmount: number | null;
   isMember: boolean | null;
   insurance: InsuranceAmount | null;
+  customInsuranceAmount: number | null;
   healthLevel: HealthLevel | null;
   hasHealthCheck: boolean | null;
   hasScript: boolean | null;
@@ -26,7 +27,7 @@ const shoppingOptions = [
   { value: 1500 as ShoppingAmount, label: "R1,500", percentage: 30 },
   { value: 2000 as ShoppingAmount, label: "R2,000", percentage: 35 },
   { value: 3000 as ShoppingAmount, label: "R3,000", percentage: 40 },
-  { value: 'custom' as ShoppingAmount, label: "Add amount", percentage: 0 },
+  { value: 'custom' as ShoppingAmount, label: "Add own amount", percentage: 0 },
 ];
 
 const insuranceOptions = [
@@ -36,6 +37,7 @@ const insuranceOptions = [
   { value: 3500 as InsuranceAmount, label: "R3,500", percentage: 40 },
   { value: 4000 as InsuranceAmount, label: "R4,000", percentage: 45 },
   { value: 4500 as InsuranceAmount, label: "R4,500+", percentage: 50 },
+  { value: 'custom' as InsuranceAmount, label: "Add own amount", percentage: 0 },
 ];
 
 const healthOptions = [
@@ -52,6 +54,7 @@ export default function RewardsBuilder() {
     customAmount: null,
     isMember: null,
     insurance: null,
+    customInsuranceAmount: null,
     healthLevel: null,
     hasHealthCheck: null,
     hasScript: null,
@@ -63,8 +66,10 @@ export default function RewardsBuilder() {
   const [originalTileOpacity, setOriginalTileOpacity] = useState(1);
   const [showCustomModal, setShowCustomModal] = useState(false);
   const [customInput, setCustomInput] = useState('');
+  const [showCustomInsuranceModal, setShowCustomInsuranceModal] = useState(false);
+  const [customInsuranceInput, setCustomInsuranceInput] = useState('');
 
-  const getInsurancePercentage = (insuranceAmount: InsuranceAmount, healthLevel: HealthLevel | null): number => {
+  const getInsurancePercentage = (insuranceAmount: InsuranceAmount, healthLevel: HealthLevel | null, customAmount?: number | null): number => {
     // Default percentages (Health level 1 - "Oh boy")
     const basePercentages: Record<InsuranceAmount, number> = {
       500: 20,
@@ -112,6 +117,18 @@ export default function RewardsBuilder() {
       },
     };
 
+    // Handle custom insurance amounts
+    if (insuranceAmount === 'custom') {
+      if (!customAmount) return 0;
+      // Calculate percentage based on custom amount tiers
+      if (customAmount >= 4500) return healthLevel ? healthLevelPercentages[healthLevel][4500] : basePercentages[4500];
+      if (customAmount >= 4000) return healthLevel ? healthLevelPercentages[healthLevel][4000] : basePercentages[4000];
+      if (customAmount >= 3500) return healthLevel ? healthLevelPercentages[healthLevel][3500] : basePercentages[3500];
+      if (customAmount >= 2500) return healthLevel ? healthLevelPercentages[healthLevel][2500] : basePercentages[2500];
+      if (customAmount >= 1500) return healthLevel ? healthLevelPercentages[healthLevel][1500] : basePercentages[1500];
+      return healthLevel ? healthLevelPercentages[healthLevel][500] : basePercentages[500];
+    }
+
     if (!healthLevel) return basePercentages[insuranceAmount];
     return healthLevelPercentages[healthLevel][insuranceAmount];
   };
@@ -136,7 +153,10 @@ export default function RewardsBuilder() {
 
     // If insurance is selected, replace the base percentage with insurance percentage
     if (selections.insurance) {
-      discountPercentage = getInsurancePercentage(selections.insurance, selections.healthLevel);
+      const insuranceAmount = selections.insurance === 'custom'
+        ? selections.customInsuranceAmount
+        : selections.insurance;
+      discountPercentage = getInsurancePercentage(selections.insurance, selections.healthLevel, selections.customInsuranceAmount);
     }
 
     // Add 5% boost for pharmacy script
@@ -174,6 +194,33 @@ export default function RewardsBuilder() {
         ...selections,
         shopping: selections.shopping === value ? null : value,
         customAmount: null
+      });
+    }
+  };
+
+  // Handle custom insurance amount submission
+  const handleCustomInsuranceSubmit = () => {
+    const amount = parseInt(customInsuranceInput);
+    if (amount && amount > 0) {
+      setSelections({
+        ...selections,
+        insurance: 'custom',
+        customInsuranceAmount: amount
+      });
+      setShowCustomInsuranceModal(false);
+      setCustomInsuranceInput('');
+    }
+  };
+
+  // Handle insurance option click
+  const handleInsuranceOptionClick = (value: InsuranceAmount) => {
+    if (value === 'custom') {
+      setShowCustomInsuranceModal(true);
+    } else {
+      setSelections({
+        ...selections,
+        insurance: selections.insurance === value ? null : value,
+        customInsuranceAmount: null
       });
     }
   };
@@ -406,27 +453,74 @@ export default function RewardsBuilder() {
                   {insuranceOptions.map((option) => (
                     <Card
                       key={option.value}
-                      className={`relative p-6 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 ${selections.insurance === option.value
-                        ? "border-primary bg-accent shadow-hover"
-                        : "border-border hover:border-primary/50"
+                      className={`relative p-6 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 ${option.value === 'custom' ? 'col-span-2' : ''
+                        } ${selections.insurance === option.value
+                          ? "border-primary bg-accent shadow-hover"
+                          : "border-border hover:border-primary/50"
                         }`}
-                      onClick={() => setSelections({
-                        ...selections,
-                        insurance: selections.insurance === option.value ? null : option.value
-                      })}
+                      onClick={() => handleInsuranceOptionClick(option.value)}
                     >
                       {selections.insurance === option.value && (
                         <div className="absolute top-3 right-3 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
                           <Check className="w-4 h-4 text-primary-foreground" />
                         </div>
                       )}
-                      <div className="text-2xl font-bold text-foreground mb-1">{option.label}</div>
-                      <div className="text-sm text-primary font-medium">
-                        {getInsurancePercentage(option.value, selections.healthLevel)}% back
+                      <div className="text-2xl font-bold text-foreground mb-1">
+                        {option.value === 'custom' && selections.customInsuranceAmount
+                          ? `R${selections.customInsuranceAmount.toLocaleString()}`
+                          : option.label}
                       </div>
+                      {option.value !== 'custom' && (
+                        <div className="text-sm text-primary font-medium">
+                          {getInsurancePercentage(option.value, selections.healthLevel)}% back
+                        </div>
+                      )}
+                      {option.value === 'custom' && selections.customInsuranceAmount && (
+                        <div className="text-sm text-primary font-medium">
+                          {getInsurancePercentage(option.value, selections.healthLevel, selections.customInsuranceAmount)}% back
+                        </div>
+                      )}
                     </Card>
                   ))}
                 </div>
+
+                {/* Custom Insurance Amount Modal */}
+                <Dialog open={showCustomInsuranceModal} onOpenChange={setShowCustomInsuranceModal}>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Add Custom Insurance Amount</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">R</span>
+                        <Input
+                          type="number"
+                          placeholder="0"
+                          value={customInsuranceInput}
+                          onChange={(e) => setCustomInsuranceInput(e.target.value)}
+                          className="pl-8"
+                          min="1"
+                        />
+                      </div>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowCustomInsuranceModal(false)}
+                          className="flex-1"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={handleCustomInsuranceSubmit}
+                          className="flex-1"
+                          disabled={!customInsuranceInput || parseInt(customInsuranceInput) <= 0}
+                        >
+                          Add
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
 
               {/* Divider */}
