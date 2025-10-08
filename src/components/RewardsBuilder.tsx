@@ -96,9 +96,9 @@ export default function RewardsBuilder() {
       {/* Main Content with Sticky Discount */}
       <section className="pb-20">
         <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto grid lg:grid-cols-[1fr_320px] gap-8">
+          <div className="max-w-6xl mx-auto grid lg:grid-cols-[1fr_320px] gap-8 items-start">
             {/* Configuration Options */}
-            <div className="space-y-12 order-2 lg:order-1 lg:pb-8">
+            <div className="space-y-12 order-2 lg:order-1">
             {/* Shopping Amount */}
             <div className="space-y-4">
               <div>
@@ -276,8 +276,8 @@ export default function RewardsBuilder() {
             </div>
 
             {/* Sticky Discount Display */}
-            <div className="order-1 lg:order-2 h-fit">
-              <div className="lg:sticky lg:top-4 z-20 bg-card rounded-2xl p-6 shadow-card border border-border mb-8 lg:mb-0">
+            <div className="order-1 lg:order-2 lg:sticky lg:top-4 lg:self-start mb-8 lg:mb-0">
+              <div className="bg-card rounded-2xl p-6 shadow-card border border-border">
                 <div className="text-muted-foreground text-xs uppercase tracking-wide mb-2">
                   Your Total Discount
                 </div>
