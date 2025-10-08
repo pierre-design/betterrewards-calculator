@@ -187,92 +187,44 @@ export default function RewardsBuilder() {
               </div>
             </div>
 
-            {/* Yes/No Options */}
+            {/* Toggle Options */}
             <div className="grid md:grid-cols-2 gap-6">
               {/* Pharmacy Script */}
-              <div className="space-y-4">
-                <div>
-                  <h2 className="text-2xl font-bold mb-2">Monthly Pharmacy Script?</h2>
-                  <p className="text-muted-foreground">Do you have a regular prescription?</p>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <Card
-                    className={`relative p-8 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 ${
-                      selections.hasScript === true
-                        ? "border-primary bg-accent shadow-hover"
-                        : "border-border hover:border-primary/50"
-                    }`}
-                    onClick={() => setSelections({ ...selections, hasScript: true })}
-                  >
-                    {selections.hasScript === true && (
-                      <div className="absolute top-3 right-3 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                        <Check className="w-4 h-4 text-primary-foreground" />
-                      </div>
-                    )}
-                    <div className="text-2xl font-bold text-foreground mb-1">Yes</div>
-                    <div className="text-sm text-primary font-medium">+R200</div>
-                  </Card>
-                  <Card
-                    className={`relative p-8 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 ${
-                      selections.hasScript === false
-                        ? "border-primary bg-accent shadow-hover"
-                        : "border-border hover:border-primary/50"
-                    }`}
-                    onClick={() => setSelections({ ...selections, hasScript: false })}
-                  >
-                    {selections.hasScript === false && (
-                      <div className="absolute top-3 right-3 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                        <Check className="w-4 h-4 text-primary-foreground" />
-                      </div>
-                    )}
-                    <div className="text-2xl font-bold text-foreground mb-1">No</div>
-                    <div className="text-sm text-muted-foreground">+R0</div>
-                  </Card>
-                </div>
-              </div>
+              <Card
+                className={`relative p-8 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 ${
+                  selections.hasScript === true
+                    ? "border-primary bg-accent shadow-hover"
+                    : "border-border hover:border-primary/50"
+                }`}
+                onClick={() => setSelections({ ...selections, hasScript: !selections.hasScript })}
+              >
+                {selections.hasScript === true && (
+                  <div className="absolute top-3 right-3 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                    <Check className="w-4 h-4 text-primary-foreground" />
+                  </div>
+                )}
+                <div className="text-2xl font-bold text-foreground mb-2">Monthly Pharmacy Script</div>
+                <div className="text-sm text-primary font-medium">+R200</div>
+              </Card>
 
               {/* Capitec Banking */}
-              <div className="space-y-4">
-                <div>
-                  <h2 className="text-2xl font-bold mb-2">Bank with Capitec?</h2>
-                  <p className="text-muted-foreground">Are you a Capitec customer?</p>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <Card
-                    className={`relative p-8 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 ${
-                      selections.hasCapitec === true
-                        ? "border-primary bg-accent shadow-hover"
-                        : "border-border hover:border-primary/50"
-                    }`}
-                    onClick={() => setSelections({ ...selections, hasCapitec: true })}
-                  >
-                    {selections.hasCapitec === true && (
-                      <div className="absolute top-3 right-3 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                        <Check className="w-4 h-4 text-primary-foreground" />
-                      </div>
-                    )}
-                    <div className="text-2xl font-bold text-foreground mb-1">Yes</div>
-                    <div className="text-sm text-primary font-medium">+R150</div>
-                  </Card>
-                  <Card
-                    className={`relative p-8 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 ${
-                      selections.hasCapitec === false
-                        ? "border-primary bg-accent shadow-hover"
-                        : "border-border hover:border-primary/50"
-                    }`}
-                    onClick={() => setSelections({ ...selections, hasCapitec: false })}
-                  >
-                    {selections.hasCapitec === false && (
-                      <div className="absolute top-3 right-3 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                        <Check className="w-4 h-4 text-primary-foreground" />
-                      </div>
-                    )}
-                    <div className="text-2xl font-bold text-foreground mb-1">No</div>
-                    <div className="text-sm text-muted-foreground">+R0</div>
-                  </Card>
-                </div>
-              </div>
-              </div>
+              <Card
+                className={`relative p-8 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 ${
+                  selections.hasCapitec === true
+                    ? "border-primary bg-accent shadow-hover"
+                    : "border-border hover:border-primary/50"
+                }`}
+                onClick={() => setSelections({ ...selections, hasCapitec: !selections.hasCapitec })}
+              >
+                {selections.hasCapitec === true && (
+                  <div className="absolute top-3 right-3 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                    <Check className="w-4 h-4 text-primary-foreground" />
+                  </div>
+                )}
+                <div className="text-2xl font-bold text-foreground mb-2">Pay with Capitec account</div>
+                <div className="text-sm text-primary font-medium">+R150</div>
+              </Card>
+            </div>
             </div>
 
             {/* Sticky Discount Display */}
