@@ -105,7 +105,7 @@ export default function RewardsBuilder() {
                 <h2 className="text-2xl font-bold mb-2">Monthly Shopping at Dis-Chem</h2>
                 <p className="text-muted-foreground">Select your typical monthly spend</p>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {shoppingOptions.map((option) => (
                   <Card
                     key={option.value}
@@ -134,7 +134,7 @@ export default function RewardsBuilder() {
                 <h2 className="text-2xl font-bold mb-2">Current Spend on Life Insurance</h2>
                 <p className="text-muted-foreground">Your monthly life insurance premium</p>
               </div>
-              <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {insuranceOptions.map((option) => (
                   <Card
                     key={option.value}
@@ -163,7 +163,7 @@ export default function RewardsBuilder() {
                 <h2 className="text-2xl font-bold mb-2">Health Level</h2>
                 <p className="text-muted-foreground">How would you describe your fitness level?</p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {healthOptions.map((option) => (
                   <Card
                     key={option.value}
