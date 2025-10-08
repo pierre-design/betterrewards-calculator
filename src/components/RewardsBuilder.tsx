@@ -169,10 +169,36 @@ export default function RewardsBuilder() {
     discountPercentage = Math.min(discountPercentage, 100);
 
     // Apply the total discount percentage to the shopping amount
-    return Math.round((actualShoppingAmount * discountPercentage) / 100);
+    const calculatedDiscount = Math.round((actualShoppingAmount * discountPercentage) / 100);
+
+    // Cap the maximum discount at R3,000 per month
+    return Math.min(calculatedDiscount, 3000);
   };
 
   const totalDiscount = calculateDiscount();
+
+  // Check if discount cap has been reached
+  const isDiscountCapped = () => {
+    if (!selections.shopping) return false;
+
+    const actualShoppingAmount = selections.shopping === 'custom'
+      ? selections.customAmount || 0
+      : selections.shopping;
+
+    if (actualShoppingAmount === 0) return false;
+
+    let discountPercentage = 0;
+    if (selections.isMember === true) discountPercentage = 10;
+    if (selections.insurance) {
+      discountPercentage = getInsurancePercentage(selections.insurance, selections.healthLevel, selections.customInsuranceAmount);
+    }
+    if (selections.hasScript === true) discountPercentage += 5;
+    if (selections.hasCapitec === true) discountPercentage += 5;
+    discountPercentage = Math.min(discountPercentage, 100);
+
+    const uncappedDiscount = Math.round((actualShoppingAmount * discountPercentage) / 100);
+    return uncappedDiscount > 3000;
+  };
 
   // Handle custom amount submission
   const handleCustomAmountSubmit = () => {
@@ -237,11 +263,24 @@ export default function RewardsBuilder() {
       </div>
       <div className="text-2xl md:text-3xl font-bold mt-3 text-white">every month<span className="font-normal">*</span></div>
       <div className="text-2xl md:text-3xl font-bold text-white">while protecting your loved ones</div>
-      {selections.hasHealthCheck === true && (
-        <Badge className="mt-4 bg-accent text-accent-foreground border-0">
-          + Free HealthCheck
-        </Badge>
-      )}
+      <div className="flex flex-wrap gap-2 mt-4">
+        {selections.hasHealthCheck === true && (
+          <Badge className="bg-accent text-accent-foreground border-0">
+            + Free HealthCheck
+          </Badge>
+        )}
+        {isDiscountCapped() && (
+          <Badge
+            className="border-0"
+            style={{
+              backgroundColor: '#FFDD00',
+              color: '#111111'
+            }}
+          >
+            Maximum Reached
+          </Badge>
+        )}
+      </div>
     </>
   );
 
