@@ -165,6 +165,9 @@ export default function RewardsBuilder() {
     // Add 5% boost for Capitec account
     if (selections.hasCapitec === true) discountPercentage += 5;
 
+    // Cap the maximum discount percentage at 100%
+    discountPercentage = Math.min(discountPercentage, 100);
+
     // Apply the total discount percentage to the shopping amount
     return Math.round((actualShoppingAmount * discountPercentage) / 100);
   };
@@ -446,7 +449,7 @@ export default function RewardsBuilder() {
               {/* Life Insurance */}
               <div className="space-y-4">
                 <div>
-                  <h2 className="text-2xl md:text-3xl font-bold mb-2">How much do you pay on life and<br />funeral cover?</h2>
+                  <h2 className="text-2xl md:text-3xl font-bold mb-2">How much does your life and funeral cover cost you every month?</h2>
                   <p className="text-muted-foreground">Your combined monthly premium</p>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
