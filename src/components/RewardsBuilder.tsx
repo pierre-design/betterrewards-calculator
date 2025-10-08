@@ -79,7 +79,7 @@ export default function RewardsBuilder() {
       {/* Hero Section */}
       <section className="relative overflow-hidden py-12">
         <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto text-center">
+          <div className="max-w-5xl mx-auto text-center">
             <Badge className="mb-4 bg-accent text-accent-foreground border-0">
               Rewards Program Builder
             </Badge>
@@ -96,7 +96,7 @@ export default function RewardsBuilder() {
       {/* Main Content with Sticky Discount */}
       <section className="pb-20">
         <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto grid lg:grid-cols-[1fr_400px] gap-8 items-start">
+          <div className="max-w-5xl mx-auto grid lg:grid-cols-[1fr_400px] gap-8 items-start">
             {/* Configuration Options */}
             <div className="space-y-12 order-2 lg:order-1">
             {/* Shopping Amount */}
