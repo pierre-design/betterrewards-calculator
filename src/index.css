@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -17,7 +19,7 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 215 25% 15%;
 
-    --primary: 186 85% 45%;
+    --primary: 140 100% 29%;
     --primary-foreground: 0 0% 100%;
     --primary-glow: 186 85% 65%;
 
@@ -27,8 +29,8 @@ All colors MUST be HSL.
     --muted: 215 20% 96%;
     --muted-foreground: 215 15% 45%;
 
-    --accent: 186 70% 92%;
-    --accent-foreground: 186 85% 35%;
+    --accent: 116 42% 67%;
+    --accent-foreground: 116 42% 25%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
@@ -39,7 +41,7 @@ All colors MUST be HSL.
 
     --radius: 0.75rem;
     
-    --gradient-primary: linear-gradient(135deg, hsl(186 85% 45%), hsl(186 85% 65%));
+    --gradient-primary: linear-gradient(135deg, hsl(130 52% 46%), hsl(140 100% 29%));
     --gradient-subtle: linear-gradient(180deg, hsl(0 0% 100%), hsl(215 30% 98%));
     --shadow-card: 0 4px 24px -2px hsl(215 25% 15% / 0.08);
     --shadow-hover: 0 8px 32px -4px hsl(186 85% 45% / 0.2);
@@ -81,8 +83,8 @@ All colors MUST be HSL.
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 116 42% 67%;
+    --accent-foreground: 116 42% 25%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
