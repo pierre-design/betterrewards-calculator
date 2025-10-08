@@ -96,7 +96,7 @@ export default function RewardsBuilder() {
       {/* Main Content with Sticky Discount */}
       <section className="pb-20">
         <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto grid lg:grid-cols-[1fr_320px] gap-8 items-start">
+          <div className="max-w-6xl mx-auto grid lg:grid-cols-[1fr_400px] gap-8 items-start">
             {/* Configuration Options */}
             <div className="space-y-12 order-2 lg:order-1">
             {/* Shopping Amount */}
@@ -277,14 +277,14 @@ export default function RewardsBuilder() {
 
             {/* Sticky Discount Display */}
             <div className="order-1 lg:order-2 lg:sticky lg:top-4 lg:self-start mb-8 lg:mb-0">
-              <div className="bg-card rounded-2xl p-6 shadow-card border border-border">
-                <div className="text-muted-foreground text-xs uppercase tracking-wide mb-2">
+              <div className="bg-card rounded-2xl p-12 shadow-elegant border-2 border-primary/20">
+                <div className="text-muted-foreground text-sm uppercase tracking-wider mb-4 font-semibold">
                   Your Total Discount
                 </div>
-                <div className="text-5xl font-bold bg-gradient-primary bg-clip-text text-transparent transition-all duration-500">
+                <div className="text-7xl md:text-8xl font-bold bg-gradient-primary bg-clip-text text-transparent transition-all duration-500 mb-3">
                   R{totalDiscount.toLocaleString()}
                 </div>
-                <div className="text-muted-foreground text-xs mt-2">per month</div>
+                <div className="text-muted-foreground text-base mt-3">per month</div>
               </div>
             </div>
           </div>
