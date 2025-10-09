@@ -659,7 +659,7 @@ export default function RewardsBuilder() {
               <div className="space-y-4">
                 <div>
                   <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent leading-tight pb-2">
-                    Enjoy better rewards<br />with better cover.
+                    Get better rewards<br />with better cover.
                   </h1>
                 </div>
               </div>
