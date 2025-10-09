@@ -440,7 +440,7 @@ export default function RewardsBuilder() {
       {/* Main Content with Sticky Discount */}
       <section className="pb-20">
         <div className="container mx-auto px-4">
-          <div className="max-w-5xl mx-auto grid lg:grid-cols-[1fr_400px] gap-8 items-start">
+          <div className="max-w-5xl mx-auto grid lg:grid-cols-[1fr_400px] gap-12 items-start">
             {/* Configuration Options */}
             <div className="space-y-16 order-2 lg:order-1">
               {/* Shopping Amount */}
