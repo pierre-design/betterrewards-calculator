@@ -64,6 +64,8 @@ export default function RewardsBuilder() {
   const [glowIntensity, setGlowIntensity] = useState(false);
   const [showFixedTile, setShowFixedTile] = useState(false);
   const [originalTileOpacity, setOriginalTileOpacity] = useState(1);
+  const [imageScale, setImageScale] = useState(1);
+  const [imageOpacity, setImageOpacity] = useState(1);
   const [showCustomModal, setShowCustomModal] = useState(false);
   const [customInput, setCustomInput] = useState('');
   const [showCustomInsuranceModal, setShowCustomInsuranceModal] = useState(false);
@@ -306,6 +308,38 @@ export default function RewardsBuilder() {
       const fadeStartPoint = windowHeight * 0.5; // Start fading earlier
       const fadeEndPoint = windowHeight * 0.7;   // Complete fade later
 
+      // Image scaling logic (applies to all screen sizes)
+      const imageScaleStart = 50; // Start scaling after 50px scroll
+      const imageScaleEnd = 300; // Finish scaling at 300px scroll
+      const imageFadeStart = 250; // Start fading at 250px scroll
+      const imageFadeEnd = 350; // Finish fading at 350px scroll
+
+      if (scrollY <= imageScaleStart) {
+        // No scaling yet
+        setImageScale(1);
+        setImageOpacity(1);
+      } else if (scrollY <= imageScaleEnd) {
+        // Scale down from 1 to 0.3
+        const scaleProgress = (scrollY - imageScaleStart) / (imageScaleEnd - imageScaleStart);
+        const scale = Math.max(0.3, 1 - (scaleProgress * 0.7));
+        setImageScale(scale);
+        setImageOpacity(1);
+      } else if (scrollY <= imageFadeStart) {
+        // Keep at minimum scale
+        setImageScale(0.3);
+        setImageOpacity(1);
+      } else if (scrollY <= imageFadeEnd) {
+        // Fade out
+        const fadeProgress = (scrollY - imageFadeStart) / (imageFadeEnd - imageFadeStart);
+        const opacity = Math.max(0, 1 - fadeProgress);
+        setImageScale(0.3);
+        setImageOpacity(opacity);
+      } else {
+        // Fully faded out
+        setImageScale(0.3);
+        setImageOpacity(0);
+      }
+
       if (window.innerWidth < 1024) { // Only on mobile/tablet
         if (scrollY <= fadeStartPoint) {
           // Before fade zone - original tile fully visible
@@ -369,22 +403,35 @@ export default function RewardsBuilder() {
         </div>
       )}
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-16 pb-12">
+      <section className="relative overflow-hidden pt-24 pb-12">
         <div className="container mx-auto px-4">
-          <div className="max-w-5xl mx-auto text-left">
-            <div className="mb-4">
-              <img
-                src="/better-rewards-card.png"
-                alt="Dis-Chem Better Rewards"
-                className="h-52 w-auto object-contain"
-              />
+          <div className="max-w-5xl mx-auto">
+            <div className="grid lg:grid-cols-[1fr_auto] gap-8 items-center">
+              {/* Left side - Text content */}
+              <div className="text-left">
+                <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent leading-tight pb-2">
+                  Your rewards just<br />got better!
+                </h1>
+                <p className="text-xl text-muted-foreground mb-8">
+                  Let's help you save more everyday.
+                </p>
+              </div>
+
+              {/* Right side - BetterRewards card */}
+              <div className="flex justify-center lg:justify-end">
+                <img
+                  src="/better-rewards-card.png"
+                  alt="Dis-Chem Better Rewards"
+                  className="w-auto object-contain transition-all duration-300 ease-out"
+                  style={{
+                    height: '21rem',
+                    transform: `scale(${imageScale})`,
+                    transformOrigin: 'bottom',
+                    opacity: imageOpacity
+                  }}
+                />
+              </div>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent leading-tight pb-2">
-              Your rewards just<br />got better!
-            </h1>
-            <p className="text-xl text-muted-foreground mb-8">
-              Let's help you save more everyday.
-            </p>
           </div>
         </div>
       </section>
