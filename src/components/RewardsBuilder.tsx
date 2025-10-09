@@ -752,7 +752,7 @@ export default function RewardsBuilder() {
                       <Check className="w-4 h-4 text-primary-foreground" />
                     </div>
                   )}
-                  <div className="text-2xl font-bold text-foreground mb-2">Do you pay with a Capitec account?</div>
+                  <div className="text-2xl font-bold text-foreground mb-2">Do you pay<br />with a Capitec account?</div>
                   <div className="text-sm text-primary font-medium">+5% boost</div>
                 </Card>
               </div>
