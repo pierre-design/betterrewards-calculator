@@ -265,24 +265,7 @@ export default function RewardsBuilder() {
       <div className="text-lg mt-4" style={{ color: '#8DCB89' }}>
         That's R{(totalDiscount * 12).toLocaleString()} back in your pocket every year, with cover that protects your loved ones.
       </div>
-      <div className="flex flex-wrap gap-2 mt-4">
-        {selections.hasHealthCheck === true && (
-          <Badge className="bg-accent text-accent-foreground border-0">
-            + Free HealthCheck
-          </Badge>
-        )}
-        {isDiscountCapped() && (
-          <Badge
-            className="border-0"
-            style={{
-              backgroundColor: '#FFDD00',
-              color: '#111111'
-            }}
-          >
-            Maximum Reached
-          </Badge>
-        )}
-      </div>
+
     </>
   );
 
@@ -366,12 +349,16 @@ export default function RewardsBuilder() {
         </div>
       )}
       {/* Hero Section */}
-      <section className="relative overflow-hidden pt-32 pb-12">
+      <section className="relative overflow-hidden pt-16 pb-12">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto text-left">
-            <Badge className="mb-4 bg-accent text-accent-foreground border-0">
-              BetterRewards
-            </Badge>
+            <div className="mb-4">
+              <img
+                src="/better-rewards-card.png"
+                alt="Dis-Chem Better Rewards"
+                className="h-52 w-auto object-contain"
+              />
+            </div>
             <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent leading-tight pb-2">
               Your rewards just<br />got better!
             </h1>
@@ -663,6 +650,18 @@ export default function RewardsBuilder() {
                   <div className="text-2xl font-bold text-foreground mb-2">Do you pay with a Capitec account?</div>
                   <div className="text-sm text-primary font-medium">+5% boost</div>
                 </Card>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-border"></div>
+
+              {/* Better Cover and Rewards Copy */}
+              <div className="space-y-4">
+                <div>
+                  <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent leading-tight pb-2">
+                    Enjoy better rewards<br />with better cover.
+                  </h1>
+                </div>
               </div>
             </div>
 
