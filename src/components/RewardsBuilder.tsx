@@ -392,9 +392,10 @@ export default function RewardsBuilder() {
 
             {/* Main Tile */}
             <div
-              className="relative rounded-2xl p-6 shadow-elegant border-2 border-primary/20"
+              className="relative rounded-2xl p-6 shadow-elegant border-2"
               style={{
-                background: 'linear-gradient(135deg, #006B3A 0%, #04411F 100%)'
+                background: 'linear-gradient(135deg, #006B3A 0%, #04411F 100%)',
+                borderColor: '#8DCB89'
               }}
             >
               <DiscountTileContent />
@@ -750,9 +751,10 @@ export default function RewardsBuilder() {
 
                 {/* Main Tile */}
                 <div
-                  className="relative rounded-2xl p-8 lg:p-12 shadow-elegant border-2 border-primary/20"
+                  className="relative rounded-2xl p-8 lg:p-12 shadow-elegant border-2"
                   style={{
-                    background: 'linear-gradient(135deg, #006B3A 0%, #04411F 100%)'
+                    background: 'linear-gradient(135deg, #006B3A 0%, #04411F 100%)',
+                    borderColor: '#8DCB89'
                   }}
                 >
                   <DiscountTileContent />
