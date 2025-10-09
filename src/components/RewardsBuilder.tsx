@@ -265,6 +265,26 @@ export default function RewardsBuilder() {
       <div className="text-lg mt-4" style={{ color: '#8DCB89' }}>
         That's R{(totalDiscount * 12).toLocaleString()} back in your pocket every year, with cover that protects your loved ones.
       </div>
+      {(selections.hasHealthCheck === true || isDiscountCapped()) && (
+        <div className="flex flex-wrap gap-2 mt-4">
+          {selections.hasHealthCheck === true && (
+            <Badge className="bg-accent text-accent-foreground border-0">
+              + Free HealthCheck
+            </Badge>
+          )}
+          {isDiscountCapped() && (
+            <Badge
+              className="border-0"
+              style={{
+                backgroundColor: '#FFDD00',
+                color: '#111111'
+              }}
+            >
+              Maximum Reached
+            </Badge>
+          )}
+        </div>
+      )}
 
     </>
   );
