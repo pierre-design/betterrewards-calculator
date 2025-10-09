@@ -182,6 +182,31 @@ export default function RewardsBuilder() {
 
   const totalDiscount = calculateDiscount();
 
+  const getCurrentDiscountPercentage = () => {
+    if (!selections.shopping) return 0;
+
+    let discountPercentage = 0;
+
+    // If BetterRewards Member is selected, start with 10% base
+    if (selections.isMember === true) {
+      discountPercentage = 10;
+    }
+
+    // If insurance is selected, replace the base percentage with insurance percentage
+    if (selections.insurance) {
+      discountPercentage = getInsurancePercentage(selections.insurance, selections.healthLevel, selections.customInsuranceAmount);
+    }
+
+    // Add 5% boost for pharmacy script
+    if (selections.hasScript === true) discountPercentage += 5;
+
+    // Add 5% boost for Capitec account
+    if (selections.hasCapitec === true) discountPercentage += 5;
+
+    // Cap the maximum discount percentage at 100%
+    return Math.min(discountPercentage, 100);
+  };
+
   // Check if discount cap has been reached
   const isDiscountCapped = () => {
     if (!selections.shopping) return false;
@@ -263,8 +288,15 @@ export default function RewardsBuilder() {
   const DiscountTileContent = () => (
     <>
       <h2 className="text-2xl md:text-3xl font-bold mb-2 text-white">You could be saving</h2>
-      <div className="text-5xl md:text-6xl lg:text-7xl font-bold text-white transition-all duration-500 mb-3 break-words">
-        R{totalDiscount.toLocaleString()}
+      <div className="flex items-end gap-4 mb-3">
+        <div className="text-5xl md:text-6xl lg:text-7xl font-bold text-white transition-all duration-500 break-words">
+          R{totalDiscount.toLocaleString()}
+        </div>
+        {getCurrentDiscountPercentage() > 0 && (
+          <div className="text-lg font-medium mb-2" style={{ color: '#8DCB89' }}>
+            / {getCurrentDiscountPercentage()}%
+          </div>
+        )}
       </div>
       <div className="text-2xl md:text-3xl font-bold mt-3 text-white">every month<span className="font-normal">*</span></div>
       <div className="text-lg mt-4" style={{ color: '#8DCB89' }}>
@@ -438,7 +470,7 @@ export default function RewardsBuilder() {
               {/* Left side - Text content */}
               <div className="text-left">
                 <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent leading-tight pb-2">
-                  Your rewards just<br />got better!
+                  Your rewards just<br className="hidden sm:block" /> got better!
                 </h1>
                 <p className="text-xl text-muted-foreground mb-8">
                   Let's help you save more everyday.
@@ -473,7 +505,7 @@ export default function RewardsBuilder() {
               {/* Shopping Amount */}
               <div className="space-y-4">
                 <div>
-                  <h2 className="text-2xl md:text-3xl font-bold mb-2">How much do you spend<br />at Dis-Chem?</h2>
+                  <h2 className="text-2xl md:text-3xl font-bold mb-2">How much do you spend<br className="hidden sm:block" /> at Dis-Chem?</h2>
                   <p className="text-muted-foreground">Select your typical monthly spend</p>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -506,7 +538,7 @@ export default function RewardsBuilder() {
                   <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-lg h-auto max-h-[calc(100vh-4rem)] sm:max-h-[85vh] bg-white rounded-2xl p-6 flex flex-col justify-center">
                     <DialogHeader className="space-y-6 pr-12">
                       <DialogTitle className="text-2xl md:text-3xl font-bold mb-2">
-                        How much do you spend<br />at Dis-Chem?
+                        How much do you spend<br className="hidden sm:block" /> at Dis-Chem?
                       </DialogTitle>
                       <div className="h-16"></div>
                       <h3 className="text-lg font-semibold">Add your own amount</h3>
@@ -551,7 +583,7 @@ export default function RewardsBuilder() {
               {/* BetterRewards Member */}
               <div className="space-y-4">
                 <div className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent leading-tight pb-2">
-                  Enjoy 10% just<br />for being part of BetterRewards
+                  Enjoy 10% just<br className="hidden sm:block" /> for being part of BetterRewards
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   <Card
@@ -752,7 +784,7 @@ export default function RewardsBuilder() {
                       <Check className="w-4 h-4 text-primary-foreground" />
                     </div>
                   )}
-                  <div className="text-2xl font-bold text-foreground mb-2">Do you pay<br />with a Capitec account?</div>
+                  <div className="text-2xl font-bold text-foreground mb-2">Do you pay<br className="hidden sm:block" /> with a Capitec account?</div>
                   <div className="text-sm text-primary font-medium">+5% boost</div>
                 </Card>
               </div>
