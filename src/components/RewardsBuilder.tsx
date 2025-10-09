@@ -68,6 +68,7 @@ export default function RewardsBuilder() {
   const [imageOpacity, setImageOpacity] = useState(1);
   const [ctaButtonOpacity, setCtaButtonOpacity] = useState(0);
   const [disclaimerOffset, setDisclaimerOffset] = useState(0);
+  const [ctaButtonOffset, setCtaButtonOffset] = useState(0);
   const [showCustomModal, setShowCustomModal] = useState(false);
   const [customInput, setCustomInput] = useState('');
   const [showCustomInsuranceModal, setShowCustomInsuranceModal] = useState(false);
@@ -347,12 +348,14 @@ export default function RewardsBuilder() {
       const ctaFadeEnd = windowHeight * 2.2; // Fully visible at bottom of content
 
       if (scrollY <= ctaFadeStart) {
-        // Before fade zone - button hidden, disclaimer at original position
+        // Before fade zone - button hidden behind tile, disclaimer at original position
         setCtaButtonOpacity(0);
+        setCtaButtonOffset(-80); // Start button behind discount tile
         setDisclaimerOffset(-80); // Start disclaimer higher (where it would be without button space)
       } else if (scrollY >= ctaFadeEnd) {
         // After fade zone - button fully visible, disclaimer below button
         setCtaButtonOpacity(1);
+        setCtaButtonOffset(0); // Button in final position
         setDisclaimerOffset(0); // Final position below button
       } else {
         // In fade zone - calculate opacity and offset based on scroll position
@@ -360,6 +363,7 @@ export default function RewardsBuilder() {
         const opacity = Math.max(0, Math.min(1, fadeProgress));
         const offset = -80 + (fadeProgress * 80); // Move from -80px to 0px
         setCtaButtonOpacity(opacity);
+        setCtaButtonOffset(offset);
         setDisclaimerOffset(offset);
       }
 
@@ -415,7 +419,7 @@ export default function RewardsBuilder() {
 
             {/* Main Tile */}
             <div
-              className="relative rounded-2xl p-6 shadow-elegant border-2"
+              className="relative rounded-2xl p-6 shadow-elegant border-2 z-20"
               style={{
                 background: 'linear-gradient(135deg, #006B3A 0%, #04411F 100%)',
                 borderColor: '#8DCB89'
@@ -784,7 +788,7 @@ export default function RewardsBuilder() {
 
                 {/* Main Tile */}
                 <div
-                  className="relative rounded-2xl p-8 lg:p-12 shadow-elegant border-2"
+                  className="relative rounded-2xl p-8 lg:p-12 shadow-elegant border-2 z-20"
                   style={{
                     background: 'linear-gradient(135deg, #006B3A 0%, #04411F 100%)',
                     borderColor: '#8DCB89'
@@ -795,7 +799,13 @@ export default function RewardsBuilder() {
               </div>
 
               {/* Call-to-Action Button */}
-              <div className="mt-6 relative z-10" style={{ opacity: ctaButtonOpacity }}>
+              <div
+                className="mt-6 relative z-10 transition-all duration-700 ease-out"
+                style={{
+                  opacity: ctaButtonOpacity,
+                  transform: `translateY(${ctaButtonOffset}px)`
+                }}
+              >
                 <Button
                   asChild
                   className="w-full text-lg font-semibold py-8 px-8 rounded-2xl flex items-center justify-between transition-all duration-300 hover:shadow-hover hover:-translate-y-1 border-2 border-transparent hover:border-[#FAC736]"
