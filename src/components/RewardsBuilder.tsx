@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Check } from "lucide-react";
+import { Check, ChevronRight } from "lucide-react";
 
 type ShoppingAmount = 500 | 1500 | 2000 | 3000 | 'custom';
 type InsuranceAmount = 500 | 1500 | 2500 | 3500 | 4000 | 4500 | 'custom';
@@ -66,6 +66,8 @@ export default function RewardsBuilder() {
   const [originalTileOpacity, setOriginalTileOpacity] = useState(1);
   const [imageScale, setImageScale] = useState(1);
   const [imageOpacity, setImageOpacity] = useState(1);
+  const [ctaButtonOpacity, setCtaButtonOpacity] = useState(0);
+  const [disclaimerOffset, setDisclaimerOffset] = useState(0);
   const [showCustomModal, setShowCustomModal] = useState(false);
   const [customInput, setCustomInput] = useState('');
   const [showCustomInsuranceModal, setShowCustomInsuranceModal] = useState(false);
@@ -338,6 +340,27 @@ export default function RewardsBuilder() {
         // Fully faded out
         setImageScale(0.3);
         setImageOpacity(0);
+      }
+
+      // CTA Button opacity logic
+      const ctaFadeStart = windowHeight * 1.8; // Start fading after pharmacy and Capitec options
+      const ctaFadeEnd = windowHeight * 2.2; // Fully visible at bottom of content
+
+      if (scrollY <= ctaFadeStart) {
+        // Before fade zone - button hidden, disclaimer at original position
+        setCtaButtonOpacity(0);
+        setDisclaimerOffset(-80); // Start disclaimer higher (where it would be without button space)
+      } else if (scrollY >= ctaFadeEnd) {
+        // After fade zone - button fully visible, disclaimer below button
+        setCtaButtonOpacity(1);
+        setDisclaimerOffset(0); // Final position below button
+      } else {
+        // In fade zone - calculate opacity and offset based on scroll position
+        const fadeProgress = (scrollY - ctaFadeStart) / (ctaFadeEnd - ctaFadeStart);
+        const opacity = Math.max(0, Math.min(1, fadeProgress));
+        const offset = -80 + (fadeProgress * 80); // Move from -80px to 0px
+        setCtaButtonOpacity(opacity);
+        setDisclaimerOffset(offset);
       }
 
       if (window.innerWidth < 1024) { // Only on mobile/tablet
@@ -737,7 +760,7 @@ export default function RewardsBuilder() {
               <div className="space-y-4">
                 <div>
                   <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent leading-tight pb-2">
-                    Get better rewards<br />with better cover.
+                    Get better rewards with better cover.
                   </h1>
                 </div>
               </div>
@@ -771,8 +794,31 @@ export default function RewardsBuilder() {
                 </div>
               </div>
 
+              {/* Call-to-Action Button */}
+              <div className="mt-6 relative z-10" style={{ opacity: ctaButtonOpacity }}>
+                <Button
+                  asChild
+                  className="w-full text-lg font-semibold py-8 px-8 rounded-2xl flex items-center justify-between transition-all duration-300 hover:shadow-hover hover:-translate-y-1 border-2 border-transparent hover:border-[#FAC736]"
+                  style={{
+                    backgroundColor: '#FFDD00',
+                    color: '#111111'
+                  }}
+                >
+                  <a href="https://dischemlife.co.za/product-selector/" target="_blank" rel="noopener noreferrer">
+                    <span>Start saving</span>
+                    <ChevronRight className="w-5 h-5" />
+                  </a>
+                </Button>
+              </div>
+
               {/* Disclaimer */}
-              <div className="mt-4 text-xs leading-relaxed font-thin" style={{ color: '#A5A5A5' }}>
+              <div
+                className="mt-4 text-xs leading-relaxed font-thin transition-all duration-700 ease-out relative z-0"
+                style={{
+                  color: '#A5A5A5',
+                  transform: `translateY(${disclaimerOffset}px)`
+                }}
+              >
                 Dis-Chem Life is an authorised FSP, No 50594. Products are underwritten by Guardrisk Life Limited, a licensed life insurer (FSP No 76). T&Cs apply. For full policy T&Cs & more info, visit www.dischemlife.co.za.
               </div>
             </div>
