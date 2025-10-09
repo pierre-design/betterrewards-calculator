@@ -476,20 +476,25 @@ export default function RewardsBuilder() {
 
                 {/* Custom Amount Modal */}
                 <Dialog open={showCustomModal} onOpenChange={setShowCustomModal}>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Add Custom Amount</DialogTitle>
+                  <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-lg h-auto max-h-[calc(100vh-4rem)] sm:max-h-[85vh] bg-white rounded-2xl p-6 flex flex-col justify-center">
+                    <DialogHeader className="space-y-6 pr-12">
+                      <DialogTitle className="text-2xl md:text-3xl font-bold mb-2">
+                        How much do you spend<br />at Dis-Chem?
+                      </DialogTitle>
+                      <div className="h-16"></div>
+                      <h3 className="text-lg font-semibold">Add your own amount</h3>
                     </DialogHeader>
                     <div className="space-y-4">
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">R</span>
+                      <div className="relative mb-4">
+                        <span className="absolute left-3 top-3 pr-2 text-5xl md:text-6xl font-bold text-[#00953B]">R</span>
                         <Input
                           type="number"
                           placeholder="0"
                           value={customInput}
                           onChange={(e) => setCustomInput(e.target.value)}
-                          className="pl-8"
+                          className="pl-14 pb-4 pt-2 text-5xl md:text-6xl font-bold text-[#00953B] border-0 border-b-2 border-b-gray-300 focus:border-b-[#8DCB89] focus:ring-0 focus:ring-offset-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-gray-400 bg-transparent rounded-none h-auto min-h-[4rem] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                           min="1"
+                          style={{ boxShadow: 'none' }}
                         />
                       </div>
                       <div className="flex gap-2">
@@ -585,20 +590,25 @@ export default function RewardsBuilder() {
 
                 {/* Custom Insurance Amount Modal */}
                 <Dialog open={showCustomInsuranceModal} onOpenChange={setShowCustomInsuranceModal}>
-                  <DialogContent className="sm:max-w-md">
-                    <DialogHeader>
-                      <DialogTitle>Add Custom Insurance Amount</DialogTitle>
+                  <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-lg h-auto max-h-[calc(100vh-4rem)] sm:max-h-[85vh] bg-white rounded-2xl p-6 flex flex-col justify-center">
+                    <DialogHeader className="space-y-6 pr-12">
+                      <DialogTitle className="text-2xl md:text-3xl font-bold mb-2">
+                        How much does your life and funeral cover cost you every month?
+                      </DialogTitle>
+                      <div className="h-16"></div>
+                      <h3 className="text-lg font-semibold">Add your own amount</h3>
                     </DialogHeader>
                     <div className="space-y-4">
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground">R</span>
+                      <div className="relative mb-4">
+                        <span className="absolute left-3 top-3 pr-2 text-5xl md:text-6xl font-bold text-[#00953B]">R</span>
                         <Input
                           type="number"
                           placeholder="0"
                           value={customInsuranceInput}
                           onChange={(e) => setCustomInsuranceInput(e.target.value)}
-                          className="pl-8"
+                          className="pl-14 pb-4 pt-2 text-5xl md:text-6xl font-bold text-[#00953B] border-0 border-b-2 border-b-gray-300 focus:border-b-[#8DCB89] focus:ring-0 focus:ring-offset-0 focus:outline-none focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-gray-400 bg-transparent rounded-none h-auto min-h-[4rem] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance:textfield]"
                           min="1"
+                          style={{ boxShadow: 'none' }}
                         />
                       </div>
                       <div className="flex gap-2">
