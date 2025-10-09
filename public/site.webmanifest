@@ -1,0 +1,26 @@
+{
+  "name": "Dis-Chem Rewards Builder",
+  "short_name": "Dis-Chem Rewards",
+  "description": "Build your ideal rewards package with Dis-Chem",
+  "icons": [
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#00953B",
+  "background_color": "#00953B",
+  "display": "standalone",
+  "start_url": "/"
+}
