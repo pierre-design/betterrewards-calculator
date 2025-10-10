@@ -6,6 +6,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Input } from "@/components/ui/input";
 import { Check, ChevronRight } from "lucide-react";
 
+
+
+
 type ShoppingAmount = 500 | 1500 | 2000 | 3000 | 'custom';
 type InsuranceAmount = 500 | 1500 | 2500 | 3500 | 4000 | 4500 | 'custom';
 type HealthLevel = "athlete" | "active" | "healthier" | "unhealthy" | "ohboy";
@@ -533,6 +536,17 @@ export default function RewardsBuilder() {
         setDividerTopPosition(`${discountRect.top}px`);
       }
 
+      // Update divider position to be below main-boxes (desktop only)
+      if (window.innerWidth >= 1024) {
+        const mainBoxesContainer = document.querySelector('[data-main-boxes]');
+        if (mainBoxesContainer) {
+          const mainBoxesRect = mainBoxesContainer.getBoundingClientRect();
+          const mainBoxesBottom = mainBoxesRect.bottom;
+          const spacing = 48; // 3rem spacing
+          setDividerTopPosition(`${mainBoxesBottom + spacing}px`);
+        }
+      }
+
       // Main-boxes sticky behavior - align with discount tile (desktop only)  
       if (window.innerWidth >= 1024) {
         const mainBoxesContainer = document.querySelector('[data-main-boxes]');
@@ -555,15 +569,7 @@ export default function RewardsBuilder() {
             setMainBoxesOpacity(1);
           }
 
-          // Separate fade check - only override opacity if spacer is very close
-          if (spacerElement && mainBoxesSticky) {
-            const spacerRect = spacerElement.getBoundingClientRect();
-            if (spacerRect.top <= discountRect.top) {
-              // Spacer has reached discount tile - fade out and unstick
-              setMainBoxesOpacity(0);
-              setMainBoxesSticky(false);
-            }
-          }
+
         }
 
 
@@ -1167,29 +1173,53 @@ export default function RewardsBuilder() {
                   </div>
                 </div>
 
-                {/* Full-width divider */}
-                <div
-                  data-divider="final"
-                  className="border-t border-border mt-18 mb-12 sticky z-20"
-                  style={{ top: dividerTopPosition }}
-                ></div>
 
-                {/* Final centered heading */}
+
+                {/* Divider and Final heading - sticky container */}
                 <div className="mt-[30rem] mb-[50rem]">
-                  <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 pb-2" style={{ lineHeight: '1.25' }}>
-                    <span
-                      className="bg-clip-text text-transparent"
-                      style={{
-                        backgroundImage: 'linear-gradient(135deg, #04411F 0%, #006B3A 100%)'
-                      }}
-                    >
-                      One gives you better rewards.
-                    </span>
-                    <br />
-                    <span className="bg-gradient-primary bg-clip-text text-transparent">
-                      The other gives you steps to count, and maybe a smoothie.
-                    </span>
-                  </h1>
+                  {/* Desktop: Sticky container for divider and heading */}
+                  <div
+                    className="hidden lg:block sticky z-20"
+                    style={{ top: dividerTopPosition }}
+                  >
+                    {/* Divider */}
+                    <div className="border-t border-border mb-12"></div>
+
+                    {/* Final centered heading */}
+                    <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 pb-2" style={{ lineHeight: '1.25' }}>
+                      <span
+                        className="bg-clip-text text-transparent"
+                        style={{
+                          backgroundImage: 'linear-gradient(135deg, #04411F 0%, #006B3A 100%)'
+                        }}
+                      >
+                        One gives you better rewards.
+                      </span>
+                      <br />
+                      <span className="bg-gradient-primary bg-clip-text text-transparent">
+                        The other gives you steps to count, and maybe a smoothie.
+                      </span>
+                    </h1>
+                  </div>
+
+                  {/* Mobile/Tablet version (non-sticky) */}
+                  <div className="lg:hidden">
+                    <div className="border-t border-border mb-12"></div>
+                    <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 pb-2" style={{ lineHeight: '1.25' }}>
+                      <span
+                        className="bg-clip-text text-transparent"
+                        style={{
+                          backgroundImage: 'linear-gradient(135deg, #04411F 0%, #006B3A 100%)'
+                        }}
+                      >
+                        One gives you better rewards.
+                      </span>
+                      <br />
+                      <span className="bg-gradient-primary bg-clip-text text-transparent">
+                        The other gives you steps to count, and maybe a smoothie.
+                      </span>
+                    </h1>
+                  </div>
                 </div>
 
                 {/* Spacer to enable scrolling to ideal position */}
