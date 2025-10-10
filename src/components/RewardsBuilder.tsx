@@ -81,7 +81,7 @@ export default function RewardsBuilder() {
   const subBoxes = [
     {
       id: 1,
-      title: "One Health Check. Then another. And another.",
+      title: "One HealthCheck to kick things off. Simple enough, right?",
       subtitle: "",
       hasStack: false,
       modalTitle: "Health Check",
@@ -89,7 +89,7 @@ export default function RewardsBuilder() {
     },
     {
       id: 2,
-      title: "Fill in the Age Quiz of Doom.",
+      title: "Complete a Health Age quiz",
       subtitle: "",
       hasStack: false,
       modalTitle: "Age Assessment",
@@ -105,7 +105,7 @@ export default function RewardsBuilder() {
     },
     {
       id: 4,
-      title: "Pap smears. Mammograms. Colonoscopies. To name a few.",
+      title: "More tests…like a dental check up",
       subtitle: "",
       hasStack: false,
       modalTitle: "Preventative Screenings",
@@ -153,7 +153,15 @@ export default function RewardsBuilder() {
     },
     {
       id: 10,
-      title: "Review your progress. Realise you're still not Diamond.",
+      title: "Sync your wearable. Let it track your every move.",
+      subtitle: "",
+      hasStack: false,
+      modalTitle: "Wearable Tracking",
+      modalDescription: "Connect your fitness tracker and let it monitor everything you do. Every step, every heartbeat, every moment of inactivity - it's all being watched and judged."
+    },
+    {
+      id: 11,
+      title: "Review your progress. Realise you're still not top Top status.",
       subtitle: "",
       hasStack: false,
       modalTitle: "Progress Review",
