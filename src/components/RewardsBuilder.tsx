@@ -49,53 +49,7 @@ const healthOptions = [
 ];
 
 export default function RewardsBuilder() {
-  // Add custom tablet breakpoint styles
-  React.useEffect(() => {
-    const style = document.createElement('style');
-    style.textContent = `
-      @media (min-width: 720px) {
-        .tablet\\:grid { display: grid; }
-        .tablet\\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        .tablet\\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-        .tablet\\:grid-cols-\\[1fr_350px\\] { grid-template-columns: 1fr 350px; }
-        .tablet\\:hidden { display: none; }
-        .tablet\\:flex { display: flex; }
-        .tablet\\:text-xs { font-size: 0.75rem; line-height: 1rem; }
-        .tablet\\:text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-        .tablet\\:text-base { font-size: 1rem; line-height: 1.5rem; }
-        .tablet\\:text-lg { font-size: 1.125rem; line-height: 1.75rem; }
-        .tablet\\:text-xl { font-size: 1.25rem; line-height: 1.75rem; }
-        .tablet\\:text-2xl { font-size: 1.5rem; line-height: 2rem; }
-        .tablet\\:text-3xl { font-size: 1.875rem; line-height: 2.25rem; }
-        .tablet\\:text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
-        .tablet\\:text-5xl { font-size: 3rem; line-height: 1; }
-        .tablet\\:p-4 { padding: 1rem; }
-        .tablet\\:p-6 { padding: 1.5rem; }
-        .tablet\\:px-0 { padding-left: 0; padding-right: 0; }
-        .tablet\\:mb-4 { margin-bottom: 1rem; }
-        .tablet\\:mb-6 { margin-bottom: 1.5rem; }
-        .tablet\\:mb-8 { margin-bottom: 2rem; }
-        .tablet\\:gap-4 { gap: 1rem; }
-        .tablet\\:gap-6 { gap: 1.5rem; }
-        .tablet\\:gap-8 { gap: 2rem; }
-        .tablet\\:space-y-0 > :not([hidden]) ~ :not([hidden]) { margin-top: 0; }
-        .tablet\\:space-y-8 > :not([hidden]) ~ :not([hidden]) { margin-top: 2rem; }
-        .tablet\\:space-y-16 > :not([hidden]) ~ :not([hidden]) { margin-top: 4rem; }
-        .tablet\\:justify-end { justify-content: flex-end; }
-        .tablet\\:order-1 { order: 1; }
-        .tablet\\:order-2 { order: 2; }
-        .tablet\\:sticky { position: sticky; }
-        .tablet\\:top-8 { top: 2rem; }
-        .tablet\\:self-start { align-self: flex-start; }
-      }
-    `;
-    document.head.appendChild(style);
-    return () => {
-      if (document.head.contains(style)) {
-        document.head.removeChild(style);
-      }
-    };
-  }, []);
+
   const [selections, setSelections] = useState<Selections>({
     shopping: null,
     customAmount: null,
@@ -502,8 +456,8 @@ export default function RewardsBuilder() {
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const windowHeight = window.innerHeight;
-      const currentIsMobile = window.innerWidth < 720;
-      const isTablet = window.innerWidth >= 720 && window.innerWidth < 1024;
+      const currentIsMobile = window.innerWidth < 768;
+      const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
       setIsMobile(currentIsMobile);
       const fadeStartPoint = windowHeight * 0.6; // Start fading when tile approaches top
       const fadeEndPoint = windowHeight * 0.75;   // Complete fade as tile reaches top
@@ -579,8 +533,8 @@ export default function RewardsBuilder() {
         setDividerTopPosition(`${discountRect.top}px`);
       }
 
-      // Main-boxes sticky behavior - align with discount tile (desktop only)
-      if (!currentIsMobile && !isTablet) {
+      // Main-boxes sticky behavior - align with discount tile (desktop only)  
+      if (window.innerWidth >= 1024) {
         const mainBoxesContainer = document.querySelector('[data-main-boxes]');
         const spacerElement = document.querySelector('[data-subbox-id="12"]');
 
@@ -588,28 +542,26 @@ export default function RewardsBuilder() {
           const discountRect = discountTile.getBoundingClientRect();
           const mainBoxesRect = mainBoxesContainer.getBoundingClientRect();
 
-          // Check if spacer has reached the discount tile (unstick trigger with fade)
-          if (spacerElement) {
-            const spacerRect = spacerElement.getBoundingClientRect();
-            const fadeZone = 100; // 100px fade zone
+          // Main-boxes become sticky when they would align with discount tile (both at top-8)
+          const stickyPosition = 32; // top-8 = 2rem = 32px
+          if (mainBoxesRect.top <= stickyPosition) {
+            setMainBoxesSticky(true);
 
-            if (spacerRect.top <= discountRect.top + fadeZone && spacerRect.top > discountRect.top) {
-              // In fade zone - calculate opacity
-              const fadeProgress = (discountRect.top + fadeZone - spacerRect.top) / fadeZone;
-              const opacity = Math.max(0, 1 - fadeProgress);
-              setMainBoxesOpacity(opacity);
-              setMainBoxesSticky(true);
-            } else if (spacerRect.top <= discountRect.top) {
-              // Fully faded and unstuck
+            // Keep full opacity when sticky
+            setMainBoxesOpacity(1);
+          } else {
+            // Not sticky yet - full opacity, not sticky
+            setMainBoxesSticky(false);
+            setMainBoxesOpacity(1);
+          }
+
+          // Separate fade check - only override opacity if spacer is very close
+          if (spacerElement && mainBoxesSticky) {
+            const spacerRect = spacerElement.getBoundingClientRect();
+            if (spacerRect.top <= discountRect.top) {
+              // Spacer has reached discount tile - fade out and unstick
               setMainBoxesOpacity(0);
               setMainBoxesSticky(false);
-            } else if (mainBoxesRect.top <= discountRect.top && !mainBoxesSticky) {
-              // Main-boxes have reached discount tile level, make them sticky
-              setMainBoxesSticky(true);
-              setMainBoxesOpacity(1);
-            } else if (!mainBoxesSticky) {
-              // Not sticky yet, full opacity
-              setMainBoxesOpacity(1);
             }
           }
         }
@@ -617,6 +569,7 @@ export default function RewardsBuilder() {
 
       } else {
         setMainBoxesSticky(false);
+        setMainBoxesOpacity(1); // Ensure main-boxes are visible on mobile/tablet
         // Reset sub-box opacities on mobile and tablet
         setSubBoxOpacities({});
       }
@@ -700,7 +653,7 @@ export default function RewardsBuilder() {
       {/* Fixed Mobile Discount Tile */}
       {showFixedTile && (
         <div
-          className="fixed top-4 left-4 right-4 z-50 tablet:hidden animate-in fade-in duration-300 transition-opacity duration-500"
+          className="fixed top-4 left-4 right-4 z-50 md:hidden animate-in fade-in duration-300 transition-opacity duration-500"
           style={{ opacity: fixedTileOpacity }}
         >
           <div className="relative">
@@ -731,19 +684,19 @@ export default function RewardsBuilder() {
       <section className="relative overflow-hidden pt-24 pb-12">
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
-            <div className="grid tablet:grid-cols-[1fr_auto] lg:grid-cols-[1fr_auto] gap-6 tablet:gap-8 items-center">
+            <div className="grid md:grid-cols-[1fr_auto] lg:grid-cols-[1fr_auto] gap-6 md:gap-8 items-center">
               {/* Left side - Text content */}
               <div className="text-left">
-                <h1 className="text-4xl tablet:text-5xl md:text-6xl font-bold mb-4 tablet:mb-6 bg-gradient-primary bg-clip-text text-transparent pb-2" style={{ lineHeight: '1.25' }}>
+                <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 bg-gradient-primary bg-clip-text text-transparent pb-2" style={{ lineHeight: '1.25' }}>
                   Your rewards just<br className="hidden sm:block" /> got better!
                 </h1>
-                <p className="text-lg tablet:text-xl text-muted-foreground mb-6 tablet:mb-8">
+                <p className="text-lg md:text-xl text-muted-foreground mb-6 md:mb-8">
                   Let's help you save more everyday.
                 </p>
               </div>
 
               {/* Right side - BetterRewards card */}
-              <div className="flex justify-center tablet:justify-end lg:justify-end">
+              <div className="flex justify-center md:justify-end lg:justify-end">
                 <img
                   src="/better-rewards-card.png"
                   alt="Dis-Chem Better Rewards"
@@ -762,20 +715,20 @@ export default function RewardsBuilder() {
       {/* Main Content with Sticky Discount */}
       <section className="pb-20">
         <div className="container mx-auto px-4">
-          <div className="max-w-5xl mx-auto grid tablet:grid-cols-[1fr_350px] lg:grid-cols-[1fr_400px] gap-8 tablet:gap-8 lg:gap-12 items-start">
+          <div className="max-w-5xl mx-auto grid md:grid-cols-[1fr_350px] lg:grid-cols-[1fr_400px] gap-8 md:gap-8 lg:gap-12 items-start">
             {/* Configuration Options */}
-            <div className="space-y-12 tablet:space-y-12 lg:space-y-16 order-2 tablet:order-1 lg:order-1">
+            <div className="space-y-12 md:space-y-12 lg:space-y-16 order-2 md:order-1 lg:order-1">
               {/* Shopping Amount */}
               <div className="space-y-4">
                 <div>
-                  <h2 className="text-xl tablet:text-2xl md:text-3xl font-bold mb-2">How much do you spend<br className="hidden sm:block" /> at Dis-Chem?</h2>
-                  <p className="text-sm tablet:text-base text-muted-foreground">Select your typical monthly spend</p>
+                  <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-2">How much do you spend<br className="hidden sm:block" /> at Dis-Chem?</h2>
+                  <p className="text-sm md:text-base text-muted-foreground">Select your typical monthly spend</p>
                 </div>
-                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 tablet:gap-4">
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
                   {shoppingOptions.map((option) => (
                     <Card
                       key={option.value}
-                      className={`relative p-4 tablet:p-6 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 ${option.value === 'custom' ? 'col-span-2 lg:col-span-2' : ''
+                      className={`relative p-4 md:p-6 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 ${option.value === 'custom' ? 'col-span-2 lg:col-span-2' : ''
                         } ${selections.shopping === option.value
                           ? "border-primary bg-accent shadow-hover"
                           : "border-border hover:border-primary/50"
@@ -1058,8 +1011,18 @@ export default function RewardsBuilder() {
               {/* Better Cover and Rewards Copy */}
               <div className="space-y-4 transition-all duration-300">
                 <div>
-                  <h1 className="text-3xl tablet:text-4xl md:text-6xl font-bold mb-4 tablet:mb-6 bg-gradient-primary bg-clip-text text-transparent pb-2" style={{ lineHeight: '1.25' }}>
-                    Some rewards really are better. Let's compare.
+                  <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 pb-2" style={{ lineHeight: '1.25' }}>
+                    <span className="bg-gradient-primary bg-clip-text text-transparent">
+                      Some rewards really are better.
+                    </span>{' '}
+                    <span
+                      className="bg-clip-text text-transparent"
+                      style={{
+                        backgroundImage: 'linear-gradient(135deg, #04411F 0%, #006B3A 100%)'
+                      }}
+                    >
+                      Let's compare.
+                    </span>
                   </h1>
                 </div>
               </div>
@@ -1074,13 +1037,13 @@ export default function RewardsBuilder() {
                   </div>
 
                   {/* BetterRewards Sub-box */}
-                  <div className="px-6 tablet:px-8">
+                  <div className="px-6 md:px-8">
                     <div
                       data-subbox-id="left-1"
                       className="relative"
                     >
-                      <Card className="relative p-4 tablet:p-6 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 border-border hover:border-primary/50 bg-white z-10">
-                        <div className="text-sm tablet:text-base font-semibold text-foreground">
+                      <Card className="relative p-4 md:p-6 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 border-border hover:border-primary/50 bg-white z-10">
+                        <div className="text-sm md:text-base font-semibold text-foreground">
                           One HealthCheck unlocks a year's worth of savings.
                         </div>
                       </Card>
@@ -1088,12 +1051,12 @@ export default function RewardsBuilder() {
                   </div>
 
                   {/* Chasing Top Status Header */}
-                  <div className="border-2 border-border rounded-2xl p-6 tablet:p-8 bg-transparent">
-                    <h2 className="text-xl tablet:text-2xl font-bold text-foreground text-center">Chasing Top Status</h2>
+                  <div className="border-2 border-border rounded-2xl p-6 md:p-8 bg-transparent">
+                    <h2 className="text-xl md:text-2xl font-bold text-foreground text-center">Chasing Top Status</h2>
                   </div>
 
                   {/* All Sub-boxes for Mobile & Tablet */}
-                  <div className="space-y-6 px-6 tablet:px-8">
+                  <div className="space-y-6 px-6 md:px-8">
                     {subBoxes.map((subBox, index) => {
                       // Handle spacer sub-box
                       if (subBox.isSpacer) {
@@ -1101,7 +1064,7 @@ export default function RewardsBuilder() {
                           <div
                             key={subBox.id}
                             data-subbox-id={subBox.id}
-                            className="h-24 tablet:h-48"
+                            className="h-24 md:h-48"
                           />
                         );
                       }
@@ -1113,13 +1076,13 @@ export default function RewardsBuilder() {
                           className="relative"
                         >
                           <Card
-                            className="relative p-4 tablet:p-6 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 border-border hover:border-primary/50 bg-white z-10"
+                            className="relative p-4 md:p-6 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 border-border hover:border-primary/50 bg-white z-10"
                             onClick={() => {
                               setSelectedSubBox(subBox.id);
                               setShowSubBoxModal(true);
                             }}
                           >
-                            <div className="text-sm tablet:text-base font-semibold text-foreground">
+                            <div className="text-sm md:text-base font-semibold text-foreground">
                               {subBox.title}
                             </div>
                           </Card>
@@ -1136,13 +1099,13 @@ export default function RewardsBuilder() {
                   style={{ opacity: mainBoxesOpacity }}
                 >
                   {/* BetterRewards */}
-                  <div className={`border-2 border-border rounded-2xl p-4 tablet:p-6 md:p-8 transition-colors duration-300 ${mainBoxesSticky ? 'bg-[#f3f3f3]/80' : 'bg-transparent'}`}>
-                    <h2 className="text-lg tablet:text-xl md:text-2xl font-bold text-foreground text-center">Dis-Chem BetterRewards</h2>
+                  <div className={`border-2 border-border rounded-2xl p-6 lg:p-8 transition-colors duration-300 ${mainBoxesSticky ? 'bg-[#f3f3f3]/80' : 'bg-transparent'}`}>
+                    <h2 className="text-xl lg:text-2xl font-bold text-foreground text-center">Dis-Chem BetterRewards</h2>
                   </div>
 
                   {/* Chasing Top Status Header */}
-                  <div className={`border-2 border-border rounded-2xl p-4 tablet:p-6 md:p-8 transition-colors duration-300 ${mainBoxesSticky ? 'bg-[#f3f3f3]/80' : 'bg-transparent'}`}>
-                    <h2 className="text-lg tablet:text-xl md:text-2xl font-bold text-foreground text-center">Chasing Top Status</h2>
+                  <div className={`border-2 border-border rounded-2xl p-6 lg:p-8 transition-colors duration-300 ${mainBoxesSticky ? 'bg-[#f3f3f3]/80' : 'bg-transparent'}`}>
+                    <h2 className="text-xl lg:text-2xl font-bold text-foreground text-center">Chasing Top Status</h2>
                   </div>
                 </div>
 
@@ -1164,7 +1127,7 @@ export default function RewardsBuilder() {
                   </div>
 
                   {/* Sub-boxes on the right */}
-                  <div className="space-y-6 tablet:space-y-6 lg:space-y-8 px-6 tablet:px-6 lg:px-0">
+                  <div className="space-y-6 lg:space-y-8 px-6 lg:px-0">
                     {subBoxes.map((subBox, index) => {
                       // Handle spacer sub-box
                       if (subBox.isSpacer) {
@@ -1186,13 +1149,13 @@ export default function RewardsBuilder() {
                         >
                           {/* Main Sub-box */}
                           <Card
-                            className="relative p-4 tablet:p-6 md:p-8 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 border-border hover:border-primary/50 bg-white z-10"
+                            className="relative p-6 lg:p-8 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 border-border hover:border-primary/50 bg-white z-10"
                             onClick={() => {
                               setSelectedSubBox(subBox.id);
                               setShowSubBoxModal(true);
                             }}
                           >
-                            <div className="text-sm tablet:text-base md:text-lg font-semibold text-foreground">
+                            <div className="text-base lg:text-lg font-semibold text-foreground">
                               {subBox.title}
                             </div>
                           </Card>
@@ -1213,7 +1176,7 @@ export default function RewardsBuilder() {
 
                 {/* Final centered heading */}
                 <div className="mt-[30rem] mb-[50rem]">
-                  <h1 className="text-3xl tablet:text-4xl md:text-6xl font-bold mb-4 tablet:mb-6 pb-2" style={{ lineHeight: '1.25' }}>
+                  <h1 className="text-3xl md:text-4xl lg:text-6xl font-bold mb-4 md:mb-6 pb-2" style={{ lineHeight: '1.25' }}>
                     <span
                       className="bg-clip-text text-transparent"
                       style={{
@@ -1236,7 +1199,7 @@ export default function RewardsBuilder() {
 
             {/* Sticky Discount Display */}
             <div
-              className="order-1 tablet:order-2 lg:order-2 tablet:sticky lg:sticky tablet:top-8 lg:top-8 tablet:self-start lg:self-start mb-6 tablet:mb-8 lg:mb-0"
+              className="order-1 md:order-2 lg:order-2 md:sticky lg:sticky md:top-8 lg:top-8 md:self-start lg:self-start mb-6 md:mb-8 lg:mb-0"
               style={{ opacity: originalTileOpacity }}
             >
               <div className="relative">
