@@ -293,7 +293,7 @@ export default function RewardsBuilder() {
           R{totalDiscount.toLocaleString()}
         </div>
         {getCurrentDiscountPercentage() > 0 && (
-          <div className="text-lg font-medium mb-2" style={{ color: '#8DCB89' }}>
+          <div className="text-lg font-medium mb-2" style={{ color: '#FFDD00' }}>
             / {getCurrentDiscountPercentage()}%
           </div>
         )}
