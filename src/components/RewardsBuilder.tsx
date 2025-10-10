@@ -69,6 +69,97 @@ export default function RewardsBuilder() {
   const [ctaButtonOpacity, setCtaButtonOpacity] = useState(0);
   const [disclaimerOffset, setDisclaimerOffset] = useState(0);
   const [ctaButtonOffset, setCtaButtonOffset] = useState(0);
+  const [showHealthModal, setShowHealthModal] = useState(false);
+  const [selectedSubBox, setSelectedSubBox] = useState<number | null>(null);
+  const [showSubBoxModal, setShowSubBoxModal] = useState(false);
+  const [healthBoxesSticky, setHealthBoxesSticky] = useState(false);
+  const [visibleSubBoxes, setVisibleSubBoxes] = useState(0);
+  const [subBoxFadeOpacity, setSubBoxFadeOpacity] = useState<Record<number, number>>({});
+
+
+  const subBoxes = [
+    {
+      id: 1,
+      title: "One Health Check. Then another. And another.",
+      subtitle: "",
+      hasStack: false,
+      modalTitle: "Health Check",
+      modalDescription: "A twenty-minute personality quiz in disguise. You'll be asked everything from how many salads you've eaten this week to how zen you feel about traffic. Points for honesty (but not too much)."
+    },
+    {
+      id: 2,
+      title: "Fill in the Age Quiz of Doom.",
+      subtitle: "",
+      hasStack: false,
+      modalTitle: "Age Assessment",
+      modalDescription: "Because one self-reflection isn't enough. Twice a year, you'll rate your stress, sleep, and mood. Miss one and you might lose more points than you gain from that \"mindful\" weekend."
+    },
+    {
+      id: 3,
+      title: "Do a Mental Health Test.",
+      subtitle: "",
+      hasStack: false,
+      modalTitle: "Mental Wellbeing Assessment",
+      modalDescription: "An online quiz measuring stress, mood, and resilience that must be completed twice a year."
+    },
+    {
+      id: 4,
+      title: "Pap smears. Mammograms. Colonoscopies. To name a few.",
+      subtitle: "",
+      hasStack: false,
+      modalTitle: "Preventative Screenings",
+      modalDescription: "Colonoscopy, Pap smear, flu jab, dental check, repeat. Each visit earns a few points and costs you a few hours (and possibly your dignity)."
+    },
+    {
+      id: 5,
+      title: "Go to the gym. A hundred times.",
+      subtitle: "",
+      hasStack: false,
+      modalTitle: "Gym Visits",
+      modalDescription: "100 gym sessions a year or it didn't happen. Skip a week? There goes your discount. Better hope your smartwatch counts that mall dash as cardio."
+    },
+    {
+      id: 6,
+      title: "Close all your activity rings. Every. Single. Week. Except for two.",
+      subtitle: "",
+      hasStack: false,
+      modalTitle: "Active Rewards Goals",
+      modalDescription: "Move 50 weeks a year. Every week. Your steps, heart rate, and activity must sync perfectly with your device. One tech glitch and it's \"try again next week.\""
+    },
+    {
+      id: 7,
+      title: "Still here? Are you okay? Take another Mental Health Test.",
+      subtitle: "",
+      hasStack: false,
+      modalTitle: "Mental Wellbeing Assessment",
+      modalDescription: "Two weekend runs because jogging in circles builds character. Miss one? You'll be chasing points instead of medals."
+    },
+    {
+      id: 8,
+      title: "Run a parkrun.",
+      subtitle: "",
+      hasStack: false,
+      modalTitle: "Parkrun or Races",
+      modalDescription: "Two weekend runs because jogging in circles builds character. Miss one? You'll be chasing points instead of medals."
+    },
+    {
+      id: 9,
+      title: "Healthy food or nothing. Your trolley decides your points.",
+      subtitle: "",
+      hasStack: false,
+      modalTitle: "HealthyFood Spend",
+      modalDescription: "Buy kale to earn points. Buy cake, lose your moral standing. Every grocery run becomes a moral dilemma between rewards and rusks."
+    },
+    {
+      id: 10,
+      title: "Review your progress. Realise you're still not Diamond.",
+      subtitle: "",
+      hasStack: false,
+      modalTitle: "Progress Review",
+      modalDescription: "Time to check if all that effort paid off. Spoiler alert: you're probably still not Diamond status, but hey, at least you tried!"
+    }
+  ];
+
   const [showCustomModal, setShowCustomModal] = useState(false);
   const [customInput, setCustomInput] = useState('');
   const [showCustomInsuranceModal, setShowCustomInsuranceModal] = useState(false);
@@ -83,6 +174,7 @@ export default function RewardsBuilder() {
       3500: 40,
       4000: 45,
       4500: 50,
+      custom: 0,
     };
 
     // Health level multipliers and specific percentages
@@ -95,6 +187,7 @@ export default function RewardsBuilder() {
         3500: 45,
         4000: 50,
         4500: 60,
+        custom: 0,
       },
       healthier: { // Level 3
         500: 25,
@@ -103,6 +196,7 @@ export default function RewardsBuilder() {
         3500: 50,
         4000: 60,
         4500: 70,
+        custom: 0,
       },
       active: { // Level 4
         500: 27.5,
@@ -111,6 +205,7 @@ export default function RewardsBuilder() {
         3500: 60,
         4000: 70,
         4500: 90,
+        custom: 0,
       },
       athlete: { // Level 5
         500: 30,
@@ -119,6 +214,7 @@ export default function RewardsBuilder() {
         3500: 70,
         4000: 90,
         4500: 100,
+        custom: 0,
       },
     };
 
@@ -421,11 +517,100 @@ export default function RewardsBuilder() {
         setOriginalTileOpacity(1);
         setShowFixedTile(false);
       }
+
+      // Health boxes sticky behavior and sub-box reveals
+      const healthSectionStart = windowHeight * 2.5; // Earlier sticky trigger
+
+      if (scrollY >= healthSectionStart) {
+        setHealthBoxesSticky(true);
+
+        // Calculate which sub-boxes should be visible based on scroll only
+        const firstBoxReveal = healthSectionStart + 600; // First box appears with much longer delay after sticky
+        const subsequentBoxInterval = windowHeight * 0.15; // Much smaller intervals (15% of viewport)
+
+        let boxesToShow = 0;
+
+        if (scrollY >= firstBoxReveal) {
+          boxesToShow = 1; // First box is visible
+
+          // Calculate additional boxes based on scroll distance
+          const additionalScroll = scrollY - firstBoxReveal;
+          const additionalBoxes = Math.floor(additionalScroll / subsequentBoxInterval);
+          boxesToShow = Math.min(subBoxes.length, 1 + additionalBoxes);
+        }
+
+        setVisibleSubBoxes(boxesToShow);
+      } else {
+        setHealthBoxesSticky(false);
+        setVisibleSubBoxes(0);
+      }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    // Set up Intersection Observer for sub-box fade effect
+    const setupSubBoxObservers = () => {
+      if (!healthBoxesSticky) return;
+
+      const stickyTop = window.innerHeight * 0.4; // Approximate sticky container position
+      const fadeZone = 50; // Pixels over which to fade
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const subBoxId = entry.target.getAttribute('data-subbox-id') || '0';
+            const rect = entry.target.getBoundingClientRect();
+
+            if (rect.top < stickyTop && rect.top > stickyTop - fadeZone) {
+              // In fade zone - calculate opacity based on position
+              const fadeProgress = (stickyTop - rect.top) / fadeZone;
+              const opacity = Math.max(0.05, 1 - fadeProgress);
+              setSubBoxFadeOpacity(prev => ({ ...prev, [subBoxId]: opacity }));
+            } else if (rect.top >= stickyTop) {
+              // Below sticky area - full opacity
+              setSubBoxFadeOpacity(prev => ({ ...prev, [subBoxId]: 1 }));
+            } else {
+              // Above sticky area - minimum opacity
+              setSubBoxFadeOpacity(prev => ({ ...prev, [subBoxId]: 0.05 }));
+            }
+          });
+        },
+        {
+          threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+          rootMargin: '0px'
+        }
+      );
+
+      // Observe all sub-boxes
+      document.querySelectorAll('[data-subbox-id]').forEach(el => {
+        observer.observe(el);
+      });
+
+      return observer;
+    };
+
+    let subBoxObserver: IntersectionObserver | undefined;
+
+    const handleScrollWithObserver = () => {
+      handleScroll();
+
+      // Clean up previous observer
+      if (subBoxObserver) {
+        subBoxObserver.disconnect();
+      }
+
+      // Set up new observer if sticky
+      if (healthBoxesSticky) {
+        subBoxObserver = setupSubBoxObservers();
+      }
+    };
+
+    window.addEventListener('scroll', handleScrollWithObserver);
+    return () => {
+      window.removeEventListener('scroll', handleScrollWithObserver);
+      if (subBoxObserver) {
+        subBoxObserver.disconnect();
+      }
+    };
+  }, [healthBoxesSticky]);
 
   return (
     <div
@@ -728,30 +913,6 @@ export default function RewardsBuilder() {
               {/* Divider */}
               <div className="border-t border-border"></div>
 
-              {/* HealthCheck */}
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <Card
-                    className={`relative p-8 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 col-span-2 ${selections.hasHealthCheck === true
-                      ? "border-primary bg-accent shadow-hover"
-                      : "border-border hover:border-primary/50"
-                      }`}
-                    onClick={() => setSelections({ ...selections, hasHealthCheck: !selections.hasHealthCheck })}
-                  >
-                    {selections.hasHealthCheck === true && (
-                      <div className="absolute top-3 right-3 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
-                        <Check className="w-4 h-4 text-primary-foreground" />
-                      </div>
-                    )}
-                    <div className="text-2xl md:text-3xl font-bold text-foreground mb-2">How about a free HealthCheck every year?</div>
-                    <div className="text-sm text-primary font-medium">Valued at R1,200</div>
-                  </Card>
-                </div>
-              </div>
-
-              {/* Divider */}
-              <div className="border-t border-border"></div>
-
               {/* Toggle Options */}
               <div className="grid md:grid-cols-2 gap-6">
                 {/* Pharmacy Script */}
@@ -792,11 +953,128 @@ export default function RewardsBuilder() {
               {/* Divider */}
               <div className="border-t border-border"></div>
 
-              {/* Better Cover and Rewards Copy */}
+              {/* HealthCheck */}
               <div className="space-y-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <Card
+                    className={`relative p-8 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 col-span-2 ${selections.hasHealthCheck === true
+                      ? "border-primary bg-accent shadow-hover"
+                      : "border-border hover:border-primary/50"
+                      }`}
+                    onClick={() => setSelections({ ...selections, hasHealthCheck: !selections.hasHealthCheck })}
+                  >
+                    {selections.hasHealthCheck === true && (
+                      <div className="absolute top-3 right-3 w-6 h-6 bg-primary rounded-full flex items-center justify-center">
+                        <Check className="w-4 h-4 text-primary-foreground" />
+                      </div>
+                    )}
+                    <div className="text-2xl md:text-3xl font-bold text-foreground mb-2">How about a free HealthCheck every year?</div>
+                    <div className="text-sm text-primary font-medium">Valued at R1,200</div>
+                  </Card>
+                </div>
+              </div>
+
+              {/* Divider */}
+              <div className="border-t border-border"></div>
+
+              {/* Better Cover and Rewards Copy */}
+              <div className={`space-y-4 transition-all duration-300 ${healthBoxesSticky ? 'sticky top-8 z-40' : ''}`}>
                 <div>
                   <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent leading-tight pb-2">
-                    Get better rewards with better cover.
+                    Some rewards really are better. Let's compare.
+                  </h1>
+                </div>
+              </div>
+
+              {/* Health Options Section */}
+              <div className="space-y-8 mt-16">
+                {/* Sticky Headers */}
+                <div className={`grid md:grid-cols-2 gap-6 items-start transition-all duration-300 ${healthBoxesSticky ? 'sticky top-64 z-30' : ''}`}>
+                  {/* BetterRewards */}
+                  <div className={`border-2 border-border rounded-2xl p-8 transition-colors duration-300 ${healthBoxesSticky ? 'bg-[#f3f3f3]/80' : 'bg-transparent'}`}>
+                    <h2 className="text-2xl font-bold text-foreground mb-2 text-center">Dis-Chem BetterRewards</h2>
+                  </div>
+
+                  {/* Chasing Diamonds Header */}
+                  <div className={`border-2 border-border rounded-2xl p-8 transition-colors duration-300 ${healthBoxesSticky ? 'bg-[#f3f3f3]/80' : 'bg-transparent'}`}>
+                    <h2 className="text-2xl font-bold text-foreground mb-2 text-center">Chasing Diamonds</h2>
+                  </div>
+                </div>
+
+                {/* Sub-boxes Container (scrolls underneath) */}
+                <div className="grid md:grid-cols-2 gap-6 items-start">
+                  {/* Left sub-box */}
+                  <div className="flex flex-col justify-between h-full">
+                    <div
+                      data-subbox-id="left-1"
+                      className={`relative transition-all duration-300 ease-out ${visibleSubBoxes > 0 ? 'opacity-100' : 'opacity-0'}`}
+                      style={{
+                        transitionDelay: '0ms',
+                        opacity: healthBoxesSticky && subBoxFadeOpacity['left-1'] !== undefined
+                          ? subBoxFadeOpacity['left-1']
+                          : visibleSubBoxes > 0 ? 1 : 0
+                      }}
+                    >
+                      <div className="border-2 border-border rounded-2xl p-8 bg-white cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 hover:border-primary/50">
+                        <div className="text-lg font-semibold text-foreground">
+                          One HealthCheck unlocks a year's worth of savings.
+                        </div>
+                      </div>
+                    </div>
+
+
+                  </div>
+
+                  {/* Sub-boxes on the right */}
+                  <div className="space-y-8">
+                    {subBoxes.map((subBox, index) => (
+                      <div
+                        key={subBox.id}
+                        data-subbox-id={subBox.id}
+                        className={`relative transition-all duration-300 ease-out ${index < visibleSubBoxes
+                          ? 'opacity-100'
+                          : 'opacity-0'
+                          }`}
+                        style={{
+                          transitionDelay: `${index * 75}ms`,
+                          opacity: healthBoxesSticky && subBoxFadeOpacity[subBox.id] !== undefined
+                            ? subBoxFadeOpacity[subBox.id]
+                            : index < visibleSubBoxes ? 1 : 0
+                        }}
+                      >
+                        {/* Main Sub-box */}
+                        <Card
+                          className="relative p-8 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 border-border hover:border-primary/50 bg-white z-10"
+                          onClick={() => {
+                            setSelectedSubBox(subBox.id);
+                            setShowSubBoxModal(true);
+                          }}
+                        >
+                          <div className="text-lg font-semibold text-foreground">
+                            {subBox.title}
+                          </div>
+                        </Card>
+
+
+                      </div>
+                    ))}
+
+
+                  </div>
+                </div>
+
+                {/* Full-width divider */}
+                <div className="border-t border-border my-12"></div>
+
+                {/* Final centered heading */}
+                <div
+                  className={`transition-opacity duration-700 ease-out mb-96 ${visibleSubBoxes >= subBoxes.length ? 'opacity-100' : 'opacity-0'}`}
+                  style={{
+                    transitionDelay: `${subBoxes.length * 75 + 300}ms`
+                  }}
+                >
+                  <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent leading-tight pb-2">
+                    One gives you better rewards. The other gives you steps to count, and maybe a smoothie.
                   </h1>
                 </div>
               </div>
@@ -867,6 +1145,63 @@ export default function RewardsBuilder() {
           </div>
         </div>
       </section>
+
+      {/* Health Option Modal */}
+      <Dialog open={showHealthModal} onOpenChange={setShowHealthModal}>
+        <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-lg h-auto max-h-[calc(100vh-4rem)] sm:max-h-[85vh] bg-white rounded-2xl p-6 flex flex-col justify-center">
+          <DialogHeader className="space-y-6 pr-12">
+            <DialogTitle className="text-2xl md:text-3xl font-bold mb-2">
+              HealthCheck
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-lg text-foreground">
+              One quick visit. One clear result. Better Rewards.
+            </p>
+            <p className="text-base text-muted-foreground">
+              Walk into any Dis-Chem clinic, get your blood pressure, glucose, cholesterol, BMI, and non-smoker check, all in one go. Thirty minutes, tops. Then go live your life (with cover and savings to match).
+            </p>
+            <div className="flex gap-2 mt-6">
+              <Button
+                variant="outline"
+                onClick={() => setShowHealthModal(false)}
+                className="flex-1"
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Sub-box Modal */}
+      <Dialog open={showSubBoxModal} onOpenChange={setShowSubBoxModal}>
+        <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-lg h-auto max-h-[calc(100vh-4rem)] sm:max-h-[85vh] bg-white rounded-2xl p-6 flex flex-col justify-center">
+          {selectedSubBox && (
+            <>
+              <DialogHeader className="space-y-6 pr-12">
+                <DialogTitle className="text-2xl md:text-3xl font-bold mb-2">
+                  {subBoxes.find(box => box.id === selectedSubBox)?.modalTitle}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <p className="text-base text-muted-foreground">
+                  {subBoxes.find(box => box.id === selectedSubBox)?.modalDescription}
+                </p>
+                <div className="flex gap-2 mt-6">
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowSubBoxModal(false)}
+                    className="flex-1"
+                  >
+                    Close
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
