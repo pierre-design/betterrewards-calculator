@@ -71,11 +71,12 @@ export default function RewardsBuilder() {
   const [showHealthModal, setShowHealthModal] = useState(false);
   const [selectedSubBox, setSelectedSubBox] = useState<number | null>(null);
   const [showSubBoxModal, setShowSubBoxModal] = useState(false);
-  const [healthBoxesSticky, setHealthBoxesSticky] = useState(false);
-  const [visibleSubBoxes, setVisibleSubBoxes] = useState(0);
-  const [subBoxFadeOpacity, setSubBoxFadeOpacity] = useState<Record<number, number>>({});
+  const [mainBoxesSticky, setMainBoxesSticky] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [fixedTileOpacity, setFixedTileOpacity] = useState(1);
+  const [dividerTopPosition, setDividerTopPosition] = useState('2rem');
+  const [mainBoxesOpacity, setMainBoxesOpacity] = useState(1);
+  const [subBoxOpacities, setSubBoxOpacities] = useState<Record<string, number>>({});
 
 
   const subBoxes = [
@@ -166,6 +167,15 @@ export default function RewardsBuilder() {
       hasStack: false,
       modalTitle: "Progress Review",
       modalDescription: "Time to check if all that effort paid off. Spoiler alert: you're probably still not Diamond status, but hey, at least you tried!"
+    },
+    {
+      id: 12,
+      title: "",
+      subtitle: "",
+      hasStack: false,
+      modalTitle: "",
+      modalDescription: "",
+      isSpacer: true
     }
   ];
 
@@ -440,7 +450,7 @@ export default function RewardsBuilder() {
     return () => clearTimeout(timer);
   }, [totalDiscount]);
 
-  // Handle scroll for mobile sticky tile
+  // Handle scroll for mobile sticky tile and main-boxes alignment
   useEffect(() => {
     const handleScroll = () => {
       const scrollY = window.scrollY;
@@ -514,31 +524,85 @@ export default function RewardsBuilder() {
         setShowFixedTile(false);
       }
 
-      // Health boxes sticky behavior and sub-box reveals
-      const healthSectionStart = windowHeight * 2.5; // Earlier sticky trigger
+      // Update divider position to match discount tile exactly (all screen sizes)
+      const discountTile = document.querySelector('.lg\\:sticky.lg\\:top-8');
+      if (discountTile) {
+        const discountRect = discountTile.getBoundingClientRect();
+        setDividerTopPosition(`${discountRect.top}px`);
+      }
 
-      if (scrollY >= healthSectionStart) {
-        setHealthBoxesSticky(true);
+      // Main-boxes sticky behavior - align with discount tile (desktop only)
+      if (!currentIsMobile) {
+        const mainBoxesContainer = document.querySelector('[data-main-boxes]');
+        const spacerElement = document.querySelector('[data-subbox-id="12"]');
 
-        // Calculate which sub-boxes should be visible based on scroll only
-        const firstBoxReveal = healthSectionStart + 600; // First box appears with much longer delay after sticky
-        const subsequentBoxInterval = windowHeight * 0.15; // Much smaller intervals (15% of viewport)
+        if (discountTile && mainBoxesContainer) {
+          const discountRect = discountTile.getBoundingClientRect();
+          const mainBoxesRect = mainBoxesContainer.getBoundingClientRect();
 
-        let boxesToShow = 0;
+          // Check if spacer has reached the discount tile (unstick trigger with fade)
+          if (spacerElement) {
+            const spacerRect = spacerElement.getBoundingClientRect();
+            const fadeZone = 100; // 100px fade zone
 
-        if (scrollY >= firstBoxReveal) {
-          boxesToShow = 1; // First box is visible
-
-          // Calculate additional boxes based on scroll distance
-          const additionalScroll = scrollY - firstBoxReveal;
-          const additionalBoxes = Math.floor(additionalScroll / subsequentBoxInterval);
-          boxesToShow = Math.min(subBoxes.length, 1 + additionalBoxes);
+            if (spacerRect.top <= discountRect.top + fadeZone && spacerRect.top > discountRect.top) {
+              // In fade zone - calculate opacity
+              const fadeProgress = (discountRect.top + fadeZone - spacerRect.top) / fadeZone;
+              const opacity = Math.max(0, 1 - fadeProgress);
+              setMainBoxesOpacity(opacity);
+              setMainBoxesSticky(true);
+            } else if (spacerRect.top <= discountRect.top) {
+              // Fully faded and unstuck
+              setMainBoxesOpacity(0);
+              setMainBoxesSticky(false);
+            } else if (mainBoxesRect.top <= discountRect.top && !mainBoxesSticky) {
+              // Main-boxes have reached discount tile level, make them sticky
+              setMainBoxesSticky(true);
+              setMainBoxesOpacity(1);
+            } else if (!mainBoxesSticky) {
+              // Not sticky yet, full opacity
+              setMainBoxesOpacity(1);
+            }
+          }
         }
 
-        setVisibleSubBoxes(boxesToShow);
+
       } else {
-        setHealthBoxesSticky(false);
-        setVisibleSubBoxes(0);
+        setMainBoxesSticky(false);
+        // Reset sub-box opacities on mobile
+        setSubBoxOpacities({});
+      }
+
+      // Sub-boxes fade logic - fade when approaching main-boxes (desktop only)
+      if (!currentIsMobile) {
+        const mainBoxesContainer = document.querySelector('[data-main-boxes]');
+        if (mainBoxesContainer) {
+          const mainBoxesRect = mainBoxesContainer.getBoundingClientRect();
+          const mainBoxesHeight = mainBoxesRect.height;
+          const fadeStartDistance = mainBoxesHeight * 1.5; // Start fading at 150% of main-boxes height
+
+          // Update all sub-boxes opacity
+          document.querySelectorAll('[data-subbox-id]').forEach(el => {
+            const subBoxId = el.getAttribute('data-subbox-id') || '';
+            if (subBoxId === '12') return; // Skip spacer
+
+            const rect = el.getBoundingClientRect();
+            const distanceFromMainBoxes = rect.top - mainBoxesRect.top;
+
+            if (distanceFromMainBoxes <= fadeStartDistance && distanceFromMainBoxes > 0) {
+              // In fade zone - calculate opacity
+              const fadeProgress = (fadeStartDistance - distanceFromMainBoxes) / fadeStartDistance;
+              const opacity = Math.max(0, 1 - fadeProgress);
+              setSubBoxOpacities(prev => ({ ...prev, [subBoxId]: opacity }));
+            } else if (distanceFromMainBoxes <= 0) {
+              // Behind main-boxes - fully transparent
+              setSubBoxOpacities(prev => ({ ...prev, [subBoxId]: 0 }));
+            } else {
+              // Above fade zone - fully visible
+              setSubBoxOpacities(prev => ({ ...prev, [subBoxId]: 1 }));
+            }
+          });
+        }
       }
 
       // Fade out fixed discount tile when specific heading reaches it (mobile only)
@@ -571,79 +635,11 @@ export default function RewardsBuilder() {
       }
     };
 
-    // Set up scroll-based fade effect for sub-boxes and main-boxes (more responsive)
-    const updateSubBoxFades = () => {
-      if (!healthBoxesSticky) return;
-
-      // Get the actual position and height of the sticky main-boxes
-      const stickyContainer = document.querySelector('.md\\:grid.md\\:grid-cols-2');
-      const stickyRect = stickyContainer?.getBoundingClientRect();
-      const stickyBottom = stickyRect ? stickyRect.bottom : 420;
-      const mainBoxHeight = stickyRect ? stickyRect.height : 100;
-      const fadeZone = mainBoxHeight;
-
-      let allSubBoxesFaded = true;
-
-      // Update all sub-boxes on every scroll
-      document.querySelectorAll('[data-subbox-id]').forEach(el => {
-        const subBoxId = el.getAttribute('data-subbox-id') || '0';
-        const rect = el.getBoundingClientRect();
-
-        if (rect.top < stickyBottom && rect.top > stickyBottom - fadeZone) {
-          // In fade zone - calculate opacity based on position
-          const fadeProgress = (stickyBottom - rect.top) / fadeZone;
-          const opacity = Math.max(0, 1 - fadeProgress);
-          setSubBoxFadeOpacity(prev => ({ ...prev, [subBoxId]: opacity }));
-          if (opacity > 0) allSubBoxesFaded = false;
-        } else if (rect.top >= stickyBottom) {
-          // Below sticky area - full opacity
-          setSubBoxFadeOpacity(prev => ({ ...prev, [subBoxId]: 1 }));
-          allSubBoxesFaded = false;
-        } else {
-          // Above sticky area - minimum opacity
-          setSubBoxFadeOpacity(prev => ({ ...prev, [subBoxId]: 0 }));
-        }
-      });
-
-      // Fade out main-boxes after all sub-boxes are faded
-      if (allSubBoxesFaded && stickyContainer) {
-        const lastSubBox = document.querySelector('[data-subbox-id]:last-of-type');
-        if (lastSubBox) {
-          const lastSubBoxRect = lastSubBox.getBoundingClientRect();
-          const mainBoxFadeStart = stickyBottom + mainBoxHeight;
-          const mainBoxFadeZone = mainBoxHeight;
-
-          if (lastSubBoxRect.top < mainBoxFadeStart && lastSubBoxRect.top > mainBoxFadeStart - mainBoxFadeZone) {
-            // Fade main-boxes based on last sub-box position
-            const fadeProgress = (mainBoxFadeStart - lastSubBoxRect.top) / mainBoxFadeZone;
-            const opacity = Math.max(0, 1 - fadeProgress);
-            stickyContainer.style.opacity = opacity.toString();
-          } else if (lastSubBoxRect.top <= mainBoxFadeStart - mainBoxFadeZone) {
-            // Fully fade out main-boxes
-            stickyContainer.style.opacity = '0';
-          } else {
-            // Keep main-boxes visible
-            stickyContainer.style.opacity = '1';
-          }
-        }
-      } else if (stickyContainer) {
-        // Keep main-boxes visible when sub-boxes are still visible
-        stickyContainer.style.opacity = '1';
-      }
-    };
-
-    const handleScrollWithFade = () => {
-      handleScroll();
-
-      // Update sub-box fades on every scroll for maximum responsiveness
-      updateSubBoxFades();
-    };
-
-    window.addEventListener('scroll', handleScrollWithFade);
+    window.addEventListener('scroll', handleScroll);
     return () => {
-      window.removeEventListener('scroll', handleScrollWithFade);
+      window.removeEventListener('scroll', handleScroll);
     };
-  }, [healthBoxesSticky]);
+  }, []);
 
   return (
     <div
@@ -1012,7 +1008,7 @@ export default function RewardsBuilder() {
               <div className="border-t border-border"></div>
 
               {/* Better Cover and Rewards Copy */}
-              <div className={`space-y-4 transition-all duration-300 ${healthBoxesSticky && !isMobile ? 'sticky top-8 z-40' : ''}`}>
+              <div className="space-y-4 transition-all duration-300">
                 <div>
                   <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent pb-2" style={{ lineHeight: '1.25' }}>
                     Some rewards really are better. Let's compare.
@@ -1051,14 +1047,18 @@ export default function RewardsBuilder() {
                 </div>
 
                 {/* Desktop: Sticky Headers */}
-                <div className={`hidden md:grid md:grid-cols-2 gap-6 items-start transition-all duration-300 ${healthBoxesSticky ? 'sticky top-80 z-30' : ''}`}>
+                <div
+                  data-main-boxes
+                  className={`hidden md:grid md:grid-cols-2 gap-6 items-start transition-all duration-300 ${mainBoxesSticky ? 'sticky top-8 z-30' : ''}`}
+                  style={{ opacity: mainBoxesOpacity }}
+                >
                   {/* BetterRewards */}
-                  <div className={`border-2 border-border rounded-2xl p-8 transition-colors duration-300 ${healthBoxesSticky ? 'bg-[#f3f3f3]/80' : 'bg-transparent'}`}>
+                  <div className={`border-2 border-border rounded-2xl p-8 transition-colors duration-300 ${mainBoxesSticky ? 'bg-[#f3f3f3]/80' : 'bg-transparent'}`}>
                     <h2 className="text-2xl font-bold text-foreground text-center">Dis-Chem BetterRewards</h2>
                   </div>
 
                   {/* Chasing Top Status Header */}
-                  <div className={`border-2 border-border rounded-2xl p-8 transition-colors duration-300 ${healthBoxesSticky ? 'bg-[#f3f3f3]/80' : 'bg-transparent'}`}>
+                  <div className={`border-2 border-border rounded-2xl p-8 transition-colors duration-300 ${mainBoxesSticky ? 'bg-[#f3f3f3]/80' : 'bg-transparent'}`}>
                     <h2 className="text-2xl font-bold text-foreground text-center">Chasing Top Status</h2>
                   </div>
                 </div>
@@ -1069,13 +1069,8 @@ export default function RewardsBuilder() {
                   <div className="hidden md:flex flex-col justify-between h-full">
                     <div
                       data-subbox-id="left-1"
-                      className={`relative transition-all duration-300 ease-out ${visibleSubBoxes > 0 ? 'opacity-100' : 'opacity-0'}`}
-                      style={{
-                        transitionDelay: '0ms',
-                        opacity: healthBoxesSticky && subBoxFadeOpacity['left-1'] !== undefined
-                          ? subBoxFadeOpacity['left-1']
-                          : visibleSubBoxes > 0 ? 1 : 0
-                      }}
+                      className="relative transition-opacity duration-300"
+                      style={{ opacity: subBoxOpacities['left-1'] ?? 1 }}
                     >
                       <Card className="relative p-8 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 border-border hover:border-primary/50 bg-white z-10">
                         <div className="text-lg font-semibold text-foreground">
@@ -1087,54 +1082,54 @@ export default function RewardsBuilder() {
 
                   {/* Sub-boxes on the right */}
                   <div className="space-y-8 px-8 md:px-0">
-                    {subBoxes.map((subBox, index) => (
-                      <div
-                        key={subBox.id}
-                        data-subbox-id={subBox.id}
-                        className={`relative transition-all duration-300 ease-out ${!isMobile && index < visibleSubBoxes
-                          ? 'opacity-100'
-                          : !isMobile ? 'opacity-0' : ''
-                          }`}
-                        style={{
-                          transitionDelay: `${index * 75}ms`,
-                          opacity: isMobile ? 1 : (
-                            healthBoxesSticky && subBoxFadeOpacity[subBox.id] !== undefined
-                              ? subBoxFadeOpacity[subBox.id]
-                              : index < visibleSubBoxes ? 1 : 0
-                          )
-                        }}
-                      >
-                        {/* Main Sub-box */}
-                        <Card
-                          className="relative p-8 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 border-border hover:border-primary/50 bg-white z-10"
-                          onClick={() => {
-                            setSelectedSubBox(subBox.id);
-                            setShowSubBoxModal(true);
-                          }}
+                    {subBoxes.map((subBox, index) => {
+                      // Handle spacer sub-box
+                      if (subBox.isSpacer) {
+                        return (
+                          <div
+                            key={subBox.id}
+                            data-subbox-id={subBox.id}
+                            className="h-48"
+                          />
+                        );
+                      }
+
+                      return (
+                        <div
+                          key={subBox.id}
+                          data-subbox-id={subBox.id}
+                          className="relative transition-opacity duration-300"
+                          style={{ opacity: subBoxOpacities[subBox.id] ?? 1 }}
                         >
-                          <div className="text-lg font-semibold text-foreground">
-                            {subBox.title}
-                          </div>
-                        </Card>
-
-
-                      </div>
-                    ))}
+                          {/* Main Sub-box */}
+                          <Card
+                            className="relative p-8 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 border-border hover:border-primary/50 bg-white z-10"
+                            onClick={() => {
+                              setSelectedSubBox(subBox.id);
+                              setShowSubBoxModal(true);
+                            }}
+                          >
+                            <div className="text-lg font-semibold text-foreground">
+                              {subBox.title}
+                            </div>
+                          </Card>
+                        </div>
+                      );
+                    })}
 
 
                   </div>
                 </div>
 
                 {/* Full-width divider */}
-                <div className="border-t border-border mt-18 mb-12"></div>
+                <div
+                  data-divider="final"
+                  className="border-t border-border mt-18 mb-12 sticky z-20"
+                  style={{ top: dividerTopPosition }}
+                ></div>
 
                 {/* Final centered heading */}
-                <div
-                  className={`transition-opacity duration-700 ease-out mb-72 ${visibleSubBoxes >= subBoxes.length ? 'opacity-100' : 'opacity-0'}`}
-                  style={{
-                    transitionDelay: `${subBoxes.length * 75 + 300}ms`
-                  }}
-                >
+                <div className="mt-[30rem] mb-[50rem]">
                   <h1 className="text-5xl md:text-6xl font-bold mb-6 pb-2" style={{ lineHeight: '1.25' }}>
                     <span
                       className="bg-clip-text text-transparent"
@@ -1150,6 +1145,9 @@ export default function RewardsBuilder() {
                     </span>
                   </h1>
                 </div>
+
+                {/* Spacer to enable scrolling to ideal position */}
+                <div className="h-[25vh]"></div>
               </div>
             </div>
 
