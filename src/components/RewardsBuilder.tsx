@@ -64,7 +64,6 @@ export default function RewardsBuilder() {
   const [glowIntensity, setGlowIntensity] = useState(false);
   const [showFixedTile, setShowFixedTile] = useState(false);
   const [originalTileOpacity, setOriginalTileOpacity] = useState(1);
-  const [imageScale, setImageScale] = useState(1);
   const [imageOpacity, setImageOpacity] = useState(1);
   const [ctaButtonOpacity, setCtaButtonOpacity] = useState(0);
   const [disclaimerOffset, setDisclaimerOffset] = useState(0);
@@ -439,35 +438,20 @@ export default function RewardsBuilder() {
       const fadeStartPoint = windowHeight * 0.5; // Start fading earlier
       const fadeEndPoint = windowHeight * 0.7;   // Complete fade later
 
-      // Image scaling logic (applies to all screen sizes)
-      const imageScaleStart = 50; // Start scaling after 50px scroll
-      const imageScaleEnd = 300; // Finish scaling at 300px scroll
-      const imageFadeStart = 250; // Start fading at 250px scroll
-      const imageFadeEnd = 350; // Finish fading at 350px scroll
+      // Image fade logic (applies to all screen sizes)
+      const imageFadeStart = 100; // Start fading at 100px scroll
+      const imageFadeEnd = 400; // Finish fading at 400px scroll
 
-      if (scrollY <= imageScaleStart) {
-        // No scaling yet
-        setImageScale(1);
-        setImageOpacity(1);
-      } else if (scrollY <= imageScaleEnd) {
-        // Scale down from 1 to 0.3
-        const scaleProgress = (scrollY - imageScaleStart) / (imageScaleEnd - imageScaleStart);
-        const scale = Math.max(0.3, 1 - (scaleProgress * 0.7));
-        setImageScale(scale);
-        setImageOpacity(1);
-      } else if (scrollY <= imageFadeStart) {
-        // Keep at minimum scale
-        setImageScale(0.3);
+      if (scrollY <= imageFadeStart) {
+        // No fading yet
         setImageOpacity(1);
       } else if (scrollY <= imageFadeEnd) {
-        // Fade out
+        // Fade out gradually
         const fadeProgress = (scrollY - imageFadeStart) / (imageFadeEnd - imageFadeStart);
         const opacity = Math.max(0, 1 - fadeProgress);
-        setImageScale(0.3);
         setImageOpacity(opacity);
       } else {
         // Fully faded out
-        setImageScale(0.3);
         setImageOpacity(0);
       }
 
@@ -562,14 +546,14 @@ export default function RewardsBuilder() {
             if (rect.top < stickyTop && rect.top > stickyTop - fadeZone) {
               // In fade zone - calculate opacity based on position
               const fadeProgress = (stickyTop - rect.top) / fadeZone;
-              const opacity = Math.max(0.05, 1 - fadeProgress);
+              const opacity = Math.max(0.03, 1 - fadeProgress);
               setSubBoxFadeOpacity(prev => ({ ...prev, [subBoxId]: opacity }));
             } else if (rect.top >= stickyTop) {
               // Below sticky area - full opacity
               setSubBoxFadeOpacity(prev => ({ ...prev, [subBoxId]: 1 }));
             } else {
               // Above sticky area - minimum opacity
-              setSubBoxFadeOpacity(prev => ({ ...prev, [subBoxId]: 0.05 }));
+              setSubBoxFadeOpacity(prev => ({ ...prev, [subBoxId]: 0.03 }));
             }
           });
         },
@@ -670,8 +654,6 @@ export default function RewardsBuilder() {
                   className="w-auto object-contain transition-all duration-300 ease-out"
                   style={{
                     height: '21rem',
-                    transform: `scale(${imageScale})`,
-                    transformOrigin: 'bottom',
                     opacity: imageOpacity
                   }}
                 />
@@ -1015,11 +997,11 @@ export default function RewardsBuilder() {
                           : visibleSubBoxes > 0 ? 1 : 0
                       }}
                     >
-                      <div className="border-2 border-border rounded-2xl p-8 bg-white cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 hover:border-primary/50">
+                      <Card className="relative p-8 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 border-border hover:border-primary/50 bg-white z-10">
                         <div className="text-lg font-semibold text-foreground">
                           One HealthCheck unlocks a year's worth of savings.
                         </div>
-                      </div>
+                      </Card>
                     </div>
 
 
@@ -1064,7 +1046,7 @@ export default function RewardsBuilder() {
                 </div>
 
                 {/* Full-width divider */}
-                <div className="border-t border-border my-12"></div>
+                <div className="border-t border-border mt-18 mb-12"></div>
 
                 {/* Final centered heading */}
                 <div
