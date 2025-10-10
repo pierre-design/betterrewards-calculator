@@ -74,6 +74,8 @@ export default function RewardsBuilder() {
   const [healthBoxesSticky, setHealthBoxesSticky] = useState(false);
   const [visibleSubBoxes, setVisibleSubBoxes] = useState(0);
   const [subBoxFadeOpacity, setSubBoxFadeOpacity] = useState<Record<number, number>>({});
+  const [isMobile, setIsMobile] = useState(false);
+  const [fixedTileOpacity, setFixedTileOpacity] = useState(1);
 
 
   const subBoxes = [
@@ -127,7 +129,7 @@ export default function RewardsBuilder() {
     },
     {
       id: 7,
-      title: "Still here? Are you okay? Take another Mental Health Test.",
+      title: "Still here? Great! Complete another Mental Health Test.",
       subtitle: "",
       hasStack: false,
       modalTitle: "Mental Wellbeing Assessment",
@@ -435,6 +437,8 @@ export default function RewardsBuilder() {
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const windowHeight = window.innerHeight;
+      const currentIsMobile = window.innerWidth < 768;
+      setIsMobile(currentIsMobile);
       const fadeStartPoint = windowHeight * 0.5; // Start fading earlier
       const fadeEndPoint = windowHeight * 0.7;   // Complete fade later
 
@@ -528,6 +532,35 @@ export default function RewardsBuilder() {
         setHealthBoxesSticky(false);
         setVisibleSubBoxes(0);
       }
+
+      // Fade out fixed discount tile when specific heading reaches it (mobile only)
+      if (currentIsMobile && showFixedTile) {
+        // Target the specific heading by its text content
+        const headings = document.querySelectorAll('h1');
+        const targetHeading = Array.from(headings).find(h =>
+          h.textContent?.includes('Some rewards really are better')
+        );
+
+        if (targetHeading) {
+          const headingRect = targetHeading.getBoundingClientRect();
+          const fixedTileBottom = 200; // Fixed tile bottom position
+          const fadeZone = 150; // Pixels over which to fade
+
+          if (headingRect.top <= fixedTileBottom && headingRect.top > fixedTileBottom - fadeZone) {
+            // In fade zone - calculate opacity based on position
+            const fadeProgress = (fixedTileBottom - headingRect.top) / fadeZone;
+            const opacity = Math.max(0, 1 - fadeProgress);
+            setFixedTileOpacity(opacity);
+          } else if (headingRect.top <= fixedTileBottom - fadeZone) {
+            // Fully faded - hide the tile
+            setFixedTileOpacity(0);
+            setShowFixedTile(false);
+          } else {
+            // Above fade zone - keep tile visible
+            setFixedTileOpacity(1);
+          }
+        }
+      }
     };
 
     // Set up Intersection Observer for sub-box fade effect
@@ -606,7 +639,10 @@ export default function RewardsBuilder() {
     >
       {/* Fixed Mobile Discount Tile */}
       {showFixedTile && (
-        <div className="fixed top-4 left-4 right-4 z-50 lg:hidden animate-in fade-in duration-300">
+        <div
+          className="fixed top-4 left-4 right-4 z-50 lg:hidden animate-in fade-in duration-300 transition-opacity duration-500"
+          style={{ opacity: fixedTileOpacity }}
+        >
           <div className="relative">
             {/* Gradient Glow Background */}
             <div
@@ -960,7 +996,7 @@ export default function RewardsBuilder() {
               <div className="border-t border-border"></div>
 
               {/* Better Cover and Rewards Copy */}
-              <div className={`space-y-4 transition-all duration-300 ${healthBoxesSticky ? 'sticky top-8 z-40' : ''}`}>
+              <div className={`space-y-4 transition-all duration-300 ${healthBoxesSticky && !isMobile ? 'sticky top-8 z-40' : ''}`}>
                 <div>
                   <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent leading-tight pb-2">
                     Some rewards really are better. Let's compare.
@@ -970,8 +1006,21 @@ export default function RewardsBuilder() {
 
               {/* Health Options Section */}
               <div className="space-y-8 mt-16">
-                {/* Sticky Headers */}
-                <div className={`grid md:grid-cols-2 gap-6 items-start transition-all duration-300 ${healthBoxesSticky ? 'sticky top-64 z-30' : ''}`}>
+                {/* Mobile: Stacked Layout */}
+                <div className="block md:hidden space-y-6">
+                  {/* BetterRewards */}
+                  <div className="border-2 border-border rounded-2xl p-8 bg-transparent">
+                    <h2 className="text-2xl font-bold text-foreground mb-2 text-center">Dis-Chem BetterRewards</h2>
+                  </div>
+
+                  {/* Chasing Diamonds Header */}
+                  <div className="border-2 border-border rounded-2xl p-8 bg-transparent">
+                    <h2 className="text-2xl font-bold text-foreground mb-2 text-center">Chasing Diamonds</h2>
+                  </div>
+                </div>
+
+                {/* Desktop: Sticky Headers */}
+                <div className={`hidden md:grid md:grid-cols-2 gap-6 items-start transition-all duration-300 ${healthBoxesSticky ? 'sticky top-64 z-30' : ''}`}>
                   {/* BetterRewards */}
                   <div className={`border-2 border-border rounded-2xl p-8 transition-colors duration-300 ${healthBoxesSticky ? 'bg-[#f3f3f3]/80' : 'bg-transparent'}`}>
                     <h2 className="text-2xl font-bold text-foreground mb-2 text-center">Dis-Chem BetterRewards</h2>
@@ -983,18 +1032,20 @@ export default function RewardsBuilder() {
                   </div>
                 </div>
 
-                {/* Sub-boxes Container (scrolls underneath) */}
-                <div className="grid md:grid-cols-2 gap-6 items-start">
+                {/* Sub-boxes Container */}
+                <div className="space-y-8 md:space-y-0 md:grid md:grid-cols-2 md:gap-6 md:items-start">
                   {/* Left sub-box */}
                   <div className="flex flex-col justify-between h-full">
                     <div
                       data-subbox-id="left-1"
-                      className={`relative transition-all duration-300 ease-out ${visibleSubBoxes > 0 ? 'opacity-100' : 'opacity-0'}`}
+                      className={`relative transition-all duration-300 ease-out ${!isMobile && visibleSubBoxes > 0 ? 'opacity-100' : !isMobile ? 'opacity-0' : ''}`}
                       style={{
                         transitionDelay: '0ms',
-                        opacity: healthBoxesSticky && subBoxFadeOpacity['left-1'] !== undefined
-                          ? subBoxFadeOpacity['left-1']
-                          : visibleSubBoxes > 0 ? 1 : 0
+                        opacity: isMobile ? 1 : (
+                          healthBoxesSticky && subBoxFadeOpacity['left-1'] !== undefined
+                            ? subBoxFadeOpacity['left-1']
+                            : visibleSubBoxes > 0 ? 1 : 0
+                        )
                       }}
                     >
                       <Card className="relative p-8 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 border-border hover:border-primary/50 bg-white z-10">
@@ -1013,15 +1064,17 @@ export default function RewardsBuilder() {
                       <div
                         key={subBox.id}
                         data-subbox-id={subBox.id}
-                        className={`relative transition-all duration-300 ease-out ${index < visibleSubBoxes
+                        className={`relative transition-all duration-300 ease-out ${!isMobile && index < visibleSubBoxes
                           ? 'opacity-100'
-                          : 'opacity-0'
+                          : !isMobile ? 'opacity-0' : ''
                           }`}
                         style={{
                           transitionDelay: `${index * 75}ms`,
-                          opacity: healthBoxesSticky && subBoxFadeOpacity[subBox.id] !== undefined
-                            ? subBoxFadeOpacity[subBox.id]
-                            : index < visibleSubBoxes ? 1 : 0
+                          opacity: isMobile ? 1 : (
+                            healthBoxesSticky && subBoxFadeOpacity[subBox.id] !== undefined
+                              ? subBoxFadeOpacity[subBox.id]
+                              : index < visibleSubBoxes ? 1 : 0
+                          )
                         }}
                       >
                         {/* Main Sub-box */}
@@ -1055,8 +1108,19 @@ export default function RewardsBuilder() {
                     transitionDelay: `${subBoxes.length * 75 + 300}ms`
                   }}
                 >
-                  <h1 className="text-5xl md:text-6xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent leading-tight pb-2">
-                    One gives you better rewards. The other gives you steps to count, and maybe a smoothie.
+                  <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight pb-2">
+                    <span
+                      className="bg-clip-text text-transparent"
+                      style={{
+                        backgroundImage: 'linear-gradient(135deg, #04411F 0%, #006B3A 100%)'
+                      }}
+                    >
+                      One gives you better rewards.
+                    </span>
+                    <br />
+                    <span className="bg-gradient-primary bg-clip-text text-transparent">
+                      The other gives you steps to count, and maybe a smoothie.
+                    </span>
                   </h1>
                 </div>
               </div>
