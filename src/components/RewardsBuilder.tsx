@@ -1223,7 +1223,7 @@ export default function RewardsBuilder() {
                 </div>
 
                 {/* Spacer to enable scrolling to ideal position */}
-                <div className="h-[25vh]"></div>
+                <div className="h-[13vh]"></div>
               </div>
             </div>
 
