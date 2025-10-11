@@ -1117,8 +1117,8 @@ export default function RewardsBuilder() {
 
                 {/* Sub-boxes Container */}
                 <div className="space-y-6 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-6 lg:items-start">
-                  {/* Left sub-box (Desktop Only) */}
-                  <div className="hidden lg:flex flex-col justify-between h-full">
+                  {/* Left sub-boxes (Desktop Only) */}
+                  <div className="hidden lg:flex flex-col space-y-8 h-full">
                     <div
                       data-subbox-id="left-1"
                       className="relative transition-opacity duration-300"
@@ -1127,6 +1127,18 @@ export default function RewardsBuilder() {
                       <Card className="relative p-8 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 border-border hover:border-primary/50 bg-white z-10">
                         <div className="text-lg font-semibold text-foreground">
                           One HealthCheck unlocks a year's worth of savings.
+                        </div>
+                      </Card>
+                    </div>
+
+                    <div
+                      data-subbox-id="left-2"
+                      className="relative transition-opacity duration-300"
+                      style={{ opacity: subBoxOpacities['left-2'] ?? 1 }}
+                    >
+                      <Card className="relative p-8 cursor-pointer transition-all duration-300 hover:shadow-hover hover:-translate-y-1 border-border hover:border-primary/50 bg-white z-10">
+                        <div className="text-lg font-semibold text-foreground">
+                          Get 10% off just for joining
                         </div>
                       </Card>
                     </div>
