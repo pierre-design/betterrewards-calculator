@@ -1058,7 +1058,7 @@ export default function RewardsBuilder() {
 
                   {/* Chasing Top Status Header */}
                   <div className="border-2 border-border rounded-2xl p-6 md:p-8 bg-transparent">
-                    <h2 className="text-xl md:text-2xl font-bold text-foreground text-center">Chasing Top Status</h2>
+                    <h2 className="text-xl md:text-2xl font-bold text-foreground text-center">The Great Status Chase</h2>
                   </div>
 
                   {/* All Sub-boxes for Mobile & Tablet */}
@@ -1111,7 +1111,7 @@ export default function RewardsBuilder() {
 
                   {/* Chasing Top Status Header */}
                   <div className={`border-2 border-border rounded-2xl p-6 lg:p-8 transition-colors duration-300 ${mainBoxesSticky ? 'bg-[#f3f3f3]/80' : 'bg-transparent'}`}>
-                    <h2 className="text-xl lg:text-2xl font-bold text-foreground text-center">Chasing Top Status</h2>
+                    <h2 className="text-xl lg:text-2xl font-bold text-foreground text-center">The Great Status Chase</h2>
                   </div>
                 </div>
 
