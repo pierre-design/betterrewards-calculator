@@ -110,6 +110,14 @@ export default function RewardsBuilder() {
     },
     {
       id: 4,
+      title: "Run a parkrun or race",
+      subtitle: "",
+      hasStack: false,
+      modalTitle: "Parkrun or Race",
+      modalDescription: "Get your running shoes on and participate in a parkrun or organized race to earn points for staying active."
+    },
+    {
+      id: 5,
       title: "More tests…like a dental check up",
       subtitle: "",
       hasStack: false,
@@ -117,7 +125,7 @@ export default function RewardsBuilder() {
       modalDescription: "Colonoscopy, Pap smear, flu jab, dental check, repeat. Each visit earns a few points and costs you a few hours (and possibly your dignity)."
     },
     {
-      id: 5,
+      id: 6,
       title: "Go to the gym. A hundred times.",
       subtitle: "",
       hasStack: false,
@@ -125,7 +133,7 @@ export default function RewardsBuilder() {
       modalDescription: "100 gym sessions a year or it didn't happen. Skip a week? There goes your discount. Better hope your smartwatch counts that mall dash as cardio."
     },
     {
-      id: 6,
+      id: 7,
       title: "Close all your activity rings. Every. Single. Week. Except for two.",
       subtitle: "",
       hasStack: false,
@@ -133,7 +141,7 @@ export default function RewardsBuilder() {
       modalDescription: "Move 50 weeks a year. Every week. Your steps, heart rate, and activity must sync perfectly with your device. One tech glitch and it's \"try again next week.\""
     },
     {
-      id: 7,
+      id: 8,
       title: "Still here? Great! Complete another Mental Health Test.",
       subtitle: "",
       hasStack: false,
@@ -141,15 +149,15 @@ export default function RewardsBuilder() {
       modalDescription: "Two weekend runs because jogging in circles builds character. Miss one? You'll be chasing points instead of medals."
     },
     {
-      id: 8,
-      title: "Run a parkrun.",
+      id: 9,
+      title: "Run yet another parkrun or race.",
       subtitle: "",
       hasStack: false,
       modalTitle: "Parkrun or Races",
       modalDescription: "Two weekend runs because jogging in circles builds character. Miss one? You'll be chasing points instead of medals."
     },
     {
-      id: 9,
+      id: 10,
       title: "Healthy food or nothing. Your trolley decides your points.",
       subtitle: "",
       hasStack: false,
@@ -157,7 +165,7 @@ export default function RewardsBuilder() {
       modalDescription: "Buy kale to earn points. Buy cake, lose your moral standing. Every grocery run becomes a moral dilemma between rewards and rusks."
     },
     {
-      id: 10,
+      id: 11,
       title: "Sync your wearable. Let it track your every move.",
       subtitle: "",
       hasStack: false,
@@ -165,15 +173,15 @@ export default function RewardsBuilder() {
       modalDescription: "Connect your fitness tracker and let it monitor everything you do. Every step, every heartbeat, every moment of inactivity - it's all being watched and judged."
     },
     {
-      id: 11,
-      title: "Review your progress. Realise you're still not top Top status.",
+      id: 12,
+      title: "Review your progress. Congrats, you've almost reached exhaustion.",
       subtitle: "",
       hasStack: false,
       modalTitle: "Progress Review",
       modalDescription: "Time to check if all that effort paid off. Spoiler alert: you're probably still not Diamond status, but hey, at least you tried!"
     },
     {
-      id: 12,
+      id: 13,
       title: "",
       subtitle: "",
       hasStack: false,
@@ -550,7 +558,7 @@ export default function RewardsBuilder() {
       // Main-boxes sticky behavior - align with discount tile (desktop only)  
       if (window.innerWidth >= 1024) {
         const mainBoxesContainer = document.querySelector('[data-main-boxes]');
-        const spacerElement = document.querySelector('[data-subbox-id="12"]');
+        const spacerElement = document.querySelector('[data-subbox-id="13"]');
 
         if (discountTile && mainBoxesContainer) {
           const discountRect = discountTile.getBoundingClientRect();
@@ -591,7 +599,7 @@ export default function RewardsBuilder() {
           // Update all sub-boxes opacity
           document.querySelectorAll('[data-subbox-id]').forEach(el => {
             const subBoxId = el.getAttribute('data-subbox-id') || '';
-            if (subBoxId === '12') return; // Skip spacer
+            if (subBoxId === '13') return; // Skip spacer
 
             const rect = el.getBoundingClientRect();
             const distanceFromMainBoxes = rect.top - mainBoxesRect.top;
