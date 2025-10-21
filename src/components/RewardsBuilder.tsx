@@ -301,9 +301,21 @@ export default function RewardsBuilder() {
     discountPercentage = Math.min(discountPercentage, 100);
 
     // Apply the total discount percentage to the shopping amount
-    const calculatedDiscount = Math.round((actualShoppingAmount * discountPercentage) / 100);
+    let calculatedDiscount = Math.round((actualShoppingAmount * discountPercentage) / 100);
 
-    // Cap the maximum discount at R3,000 per month
+    // Apply discount caps based on membership type and insurance selection
+    if (!selections.insurance) {
+      // If only Better Rewards member (no insurance), cap at R600
+      calculatedDiscount = Math.min(calculatedDiscount, 600);
+    } else {
+      // If insurance is selected, discount cannot exceed the insurance amount
+      const actualInsuranceAmount = selections.insurance === 'custom'
+        ? selections.customInsuranceAmount || 0
+        : selections.insurance;
+      calculatedDiscount = Math.min(calculatedDiscount, actualInsuranceAmount);
+    }
+
+    // Overall cap at R3,000 per month
     return Math.min(calculatedDiscount, 3000);
   };
 
