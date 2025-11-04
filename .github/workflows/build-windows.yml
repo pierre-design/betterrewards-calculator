@@ -25,11 +25,21 @@ jobs:
       with:
         targets: x86_64-pc-windows-msvc
 
-    - name: Install dependencies
+    - name: Install frontend dependencies
       run: npm ci
 
     - name: Build Tauri app for Windows
-      run: npm run tauri-build
+      uses: tauri-apps/tauri-action@v0
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tagName: ''
+        releaseName: ''
+        releaseBody: ''
+        releaseDraft: false
+        prerelease: false
+        includeDebug: false
+        includeRelease: true
 
     - name: Upload Windows artifacts
       uses: actions/upload-artifact@v4
