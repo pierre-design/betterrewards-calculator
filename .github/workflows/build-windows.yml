@@ -44,7 +44,7 @@ jobs:
     - name: Build Tauri app for Windows
       run: |
         echo "Starting Tauri build..."
-        tauri build --target x86_64-pc-windows-msvc --verbose
+        tauri build --target x86_64-pc-windows-msvc --bundles msi,nsis --verbose
       continue-on-error: false
 
     - name: List build output
@@ -71,6 +71,10 @@ jobs:
       with:
         name: better-rewards-calculator-windows
         path: |
+          src-tauri/target/x86_64-pc-windows-msvc/release/bundle/**/*.msi
+          src-tauri/target/x86_64-pc-windows-msvc/release/bundle/**/*.exe
           src-tauri/target/release/bundle/**/*.msi
           src-tauri/target/release/bundle/**/*.exe
+          src-tauri/target/**/bundle/**/*.msi
+          src-tauri/target/**/bundle/**/*.exe
         if-no-files-found: warn
