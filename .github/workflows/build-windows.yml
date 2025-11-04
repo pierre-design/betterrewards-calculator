@@ -34,13 +34,37 @@ jobs:
     - name: Install Tauri CLI
       run: npm install -g @tauri-apps/cli@latest
 
+    - name: Check Tauri info
+      run: |
+        echo "Tauri version:"
+        tauri --version
+        echo "Tauri info:"
+        tauri info
+
     - name: Build Tauri app for Windows
-      run: tauri build --target x86_64-pc-windows-msvc
+      run: |
+        echo "Starting Tauri build..."
+        tauri build --target x86_64-pc-windows-msvc --verbose
+      continue-on-error: false
 
     - name: List build output
       run: |
-        echo "Listing build output..."
-        dir src-tauri\target\release\bundle /s
+        echo "Checking if target directory exists..."
+        if (Test-Path "src-tauri\target") {
+          echo "Target directory exists, listing contents..."
+          dir src-tauri\target /s
+        } else {
+          echo "Target directory does not exist"
+        }
+        
+        echo "Checking if bundle directory exists..."
+        if (Test-Path "src-tauri\target\release\bundle") {
+          echo "Bundle directory exists, listing contents..."
+          dir src-tauri\target\release\bundle /s
+        } else {
+          echo "Bundle directory does not exist"
+        }
+      if: always()
 
     - name: Upload Windows artifacts
       uses: actions/upload-artifact@v4
