@@ -50,17 +50,17 @@ jobs:
     - name: List build output
       run: |
         echo "Checking if target directory exists..."
-        if (Test-Path "src-tauri\target") {
+        if (Test-Path "src-tauri/target") {
           echo "Target directory exists, listing contents..."
-          dir src-tauri\target /s
+          Get-ChildItem -Path "src-tauri/target" -Recurse
         } else {
           echo "Target directory does not exist"
         }
         
         echo "Checking if bundle directory exists..."
-        if (Test-Path "src-tauri\target\release\bundle") {
+        if (Test-Path "src-tauri/target/release/bundle") {
           echo "Bundle directory exists, listing contents..."
-          dir src-tauri\target\release\bundle /s
+          Get-ChildItem -Path "src-tauri/target/release/bundle" -Recurse
         } else {
           echo "Bundle directory does not exist"
         }
